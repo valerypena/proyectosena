@@ -1,0 +1,83 @@
+:root {
+  --nav-header-bg: #fff;
+  --uninpahu-orange: #ff5722;
+  --body-bg: #ebebeb;
+  --text-primary: #333333;
+  --text-secondary: #666666;
+  --primary-blue: #3483fa;
+  /* Keeping for links */
+  --primary-blue-hover: #2968c8;
+  --green-ms: #00a650;
+  --white: #ffffff;
+  --border-color: #e6e6e6;
+  --shadow-card: 0 1px 1px 0 rgba(0, 0, 0, .1);
+  --font-family: 'Proxima Nova', -apple-system, 'Helvetica Neue', Helvetica, Roboto, Arial, sans-serif;
+}
+
+* {
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
+}
+
+body {
+  font-family: var(--font-family);
+  background-color: var(--body-bg);
+  color: var(--text-primary);
+  -webkit-font-smoothing: antialiased;
+}
+
+a {
+  text-decoration: none;
+  color: inherit;
+}
+
+ul {
+  list-style: none;
+}
+
+.container {
+  max-width: 1200px;
+  margin: 0 auto;
+  padding: 0 10px;
+}
+
+button {
+  cursor: pointer;
+  border: none;
+  font-family: inherit;
+}
+
+/* Utility Classes */
+.card {
+  background: var(--white);
+  border-radius: 4px;
+  box-shadow: var(--shadow-card);
+  overflow: hidden;
+}
+
+.btn-primary {
+  background-color: var(--primary-blue);
+  color: white;
+  padding: 10px 20px;
+  border-radius: 4px;
+  font-weight: 600;
+  transition: background-color 0.2s;
+}
+
+.btn-secondary {
+  background-color: rgba(65, 137, 230, .15);
+  color: var(--primary-blue);
+  padding: 10px 20px;
+  border-radius: 4px;
+  font-weight: 600;
+  transition: background-color 0.2s;
+}
+
+.btn-secondary:hover {
+  background-color: rgba(65, 137, 230, .2);
+}
+
+.btn-primary:hover {
+  background-color: var(--primary-blue-hover);
+}

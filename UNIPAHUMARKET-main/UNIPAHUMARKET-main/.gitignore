@@ -1,0 +1,47 @@
+# Identidad del Sistema
+.DS_Store
+Thumbs.db
+
+# Entornos Virtuales y Dependencias de Python
+.venv/
+env/
+venv/
+ENV/
+build/
+dist/
+*.pyc
+__pycache__/
+*.pyo
+*.pyd
+
+# Base de Datos Local
+*.sqlite3
+*.db
+unimarket.db
+
+# Dependencias de Node.js (Frontend)
+node_modules/
+frontend/node_modules/
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+
+# Compilación y caché de Frontend
+frontend/dist/
+frontend/build/
+.cache/
+.eslintcache
+
+# Variables de Entorno (¡IMPORTante!)
+.env
+backend/.env
+frontend/.env.local
+frontend/.env.development.local
+frontend/.env.test.local
+frontend/.env.production.local
+
+# IDEs y otros
+.vscode/
+.idea/
+*.swp
+*.swo

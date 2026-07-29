@@ -1,0 +1,47 @@
+.breadcrumbs-container {
+    display: flex;
+    align-items: center;
+    font-size: 14px;
+    margin-bottom: 5px;
+    color: rgba(0, 0, 0, .55);
+    padding: 10px 0;
+}
+
+.back-link {
+    background: none;
+    border: none;
+    cursor: pointer;
+    font-size: 14px;
+    color: rgba(0, 0, 0, .55);
+    padding: 0;
+}
+
+.back-link:hover {
+    color: #3483fa;
+}
+
+.separator {
+    margin: 0 10px;
+    color: #e6e6e6;
+}
+
+.breadcrumb-links {
+    display: flex;
+    align-items: center;
+}
+
+.breadcrumb-links a {
+    color: rgba(0, 0, 0, .55);
+    text-decoration: none;
+}
+
+.breadcrumb-links a:hover {
+    color: #3483fa;
+}
+
+.arrow {
+    margin-left: 6px;
+    margin-right: 6px;
+    font-size: 10px;
+    color: #999;
+}

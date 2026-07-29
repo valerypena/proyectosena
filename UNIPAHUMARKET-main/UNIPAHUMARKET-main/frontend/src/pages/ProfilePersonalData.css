@@ -1,0 +1,124 @@
+.profile-personal-data-container {
+    padding-top: 40px;
+    padding-bottom: 60px;
+    max-width: 700px;
+    margin: 0 auto;
+}
+
+.profile-personal-card {
+    background: #fff;
+    border-radius: 8px;
+    box-shadow: 0 1px 2px 0 rgba(0, 0, 0, .15);
+    padding: 32px;
+}
+
+.profile-personal-header {
+    margin-bottom: 24px;
+    border-bottom: 1px solid #ebebeb;
+    padding-bottom: 16px;
+}
+
+.profile-personal-header h2 {
+    font-size: 24px;
+    font-weight: 600;
+    color: #333;
+}
+
+.profile-personal-header p {
+    font-size: 14px;
+    color: #999;
+    margin-top: 4px;
+}
+
+.profile-form-group {
+    margin-bottom: 24px;
+}
+
+.profile-form-label {
+    display: block;
+    font-size: 14px;
+    color: #333;
+    margin-bottom: 8px;
+    font-weight: 500;
+}
+
+.profile-form-input {
+    width: 100%;
+    padding: 12px 16px;
+    font-size: 16px;
+    border-radius: 6px;
+    border: 1px solid #e0e0e0;
+    transition: border-color 0.2s;
+    outline: none;
+    color: #333;
+}
+
+.profile-form-input:focus {
+    border-color: #3483fa;
+}
+
+.profile-form-input::placeholder {
+    color: #bdbdbd;
+}
+
+.profile-form-actions {
+    display: flex;
+    justify-content: flex-end;
+    gap: 16px;
+    margin-top: 32px;
+}
+
+.profile-message {
+    padding: 12px 16px;
+    border-radius: 6px;
+    margin-bottom: 24px;
+    font-size: 14px;
+    display: flex;
+    align-items: center;
+}
+
+.profile-message.success {
+    background-color: #e8f7ed;
+    color: #00a650;
+    border: 1px solid #c9e9d2;
+}
+
+.profile-message.error {
+    background-color: #fce8e8;
+    color: #d12424;
+    border: 1px solid #f2c2c2;
+}
+
+.btn-cancel {
+    background: transparent;
+    color: #3483fa;
+    font-weight: 600;
+    font-size: 16px;
+    padding: 12px 24px;
+    border: none;
+    transition: color 0.2s;
+}
+
+.btn-cancel:hover {
+    color: #2968c8;
+}
+
+.btn-save {
+    background-color: #3483fa;
+    color: #fff;
+    font-weight: 600;
+    font-size: 16px;
+    padding: 12px 24px;
+    border-radius: 6px;
+    border: none;
+    transition: background-color 0.2s;
+}
+
+.btn-save:hover {
+    background-color: #2968c8;
+}
+
+.btn-save:disabled {
+    background-color: #e0e0e0;
+    cursor: not-allowed;
+}

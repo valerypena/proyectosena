@@ -1,0 +1,237 @@
+.product-detail-container {
+    padding-top: 20px;
+    display: flex;
+    flex-direction: column;
+    gap: 20px;
+}
+
+.detail-card {
+    display: flex;
+    padding: 30px;
+    gap: 40px;
+    min-height: 500px;
+}
+
+.detail-image {
+    flex: 2;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
+
+.detail-image img {
+    max-width: 100%;
+    max-height: 400px;
+}
+
+.detail-info {
+    flex: 1;
+    border: 1px solid #e6e6e6;
+    /* Simula la caja de compra lateral */
+    border-radius: 8px;
+    padding: 20px;
+    height: fit-content;
+}
+
+.detail-condition {
+    font-size: 14px;
+    color: #666;
+    margin-bottom: 10px;
+    display: block;
+}
+
+.detail-title {
+    font-size: 22px;
+    font-weight: 600;
+    line-height: 1.18;
+    color: #333;
+    margin-bottom: 20px;
+}
+
+.detail-price-box {
+    margin-bottom: 20px;
+}
+
+.detail-price {
+    font-size: 36px;
+    font-weight: 300;
+    color: #333;
+    display: block;
+}
+
+.detail-installments {
+    font-size: 16px;
+    color: #333;
+}
+
+.detail-shipping {
+    margin-bottom: 30px;
+    font-size: 16px;
+}
+
+.green-text {
+    color: var(--green-ms);
+    font-weight: 600;
+}
+
+.detail-actions {
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+}
+
+.buy-now-btn {
+    width: 100%;
+    font-size: 16px;
+    padding: 12px;
+}
+
+.add-cart-btn {
+    width: 100%;
+    font-size: 16px;
+    padding: 12px;
+    background-color: #d9e7fa;
+    /* Solid color fallback */
+    color: #3483fa;
+    /* Solid blue */
+    font-weight: 600;
+    border-radius: 6px;
+    transition: background-color 0.2s;
+    border: none;
+    margin-top: 10px;
+    /* Ensure spacing if stacking */
+    cursor: pointer;
+    display: block;
+    /* Ensure it takes space */
+}
+
+.add-cart-btn:hover {
+    background-color: #cbe0fa;
+}
+
+.description-card {
+    padding: 40px;
+}
+
+.description-card h2 {
+    font-size: 24px;
+    margin-bottom: 20px;
+    font-weight: 400;
+    color: #333;
+}
+
+.description-card p {
+    font-size: 16px;
+    color: #666;
+    line-height: 1.5;
+    white-space: pre-line;
+}
+
+/* Reviews */
+.rating-summary {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    margin-bottom: 20px;
+}
+
+.rating-count {
+    font-size: 14px;
+    color: #666;
+}
+
+.reviews-card,
+.questions-card {
+    padding: 30px;
+}
+
+.reviews-list {
+    margin-top: 20px;
+}
+
+.review-item {
+    border-bottom: 1px solid #eee;
+    padding: 20px 0;
+}
+
+.review-stars {
+    margin-bottom: 10px;
+}
+
+.review-comment {
+    font-size: 14px;
+    color: #333;
+    margin-bottom: 5px;
+}
+
+.review-user {
+    font-size: 12px;
+    color: #999;
+}
+
+/* Questions */
+.ask-form {
+    display: flex;
+    gap: 15px;
+    margin: 20px 0 30px;
+}
+
+.ask-form input {
+    flex: 1;
+    padding: 12px;
+    border: 1px solid #ddd;
+    border-radius: 6px;
+    font-size: 16px;
+}
+
+.questions-list h3 {
+    font-size: 18px;
+    margin-bottom: 15px;
+    font-weight: 600;
+}
+
+.question-item {
+    margin-bottom: 25px;
+}
+
+.q-row {
+    display: flex;
+    gap: 10px;
+    align-items: flex-start;
+}
+
+.q-text {
+    font-size: 15px;
+    color: #333;
+}
+
+.a-row {
+    margin-left: 10px;
+    margin-top: 5px;
+    display: flex;
+    gap: 10px;
+}
+
+.a-line {
+    width: 12px;
+    border-left: 1px solid #ccc;
+    border-bottom: 1px solid #ccc;
+    height: 10px;
+    margin-top: 2px;
+}
+
+.a-text {
+    font-size: 14px;
+    color: #666;
+}
+
+.a-date {
+    font-size: 12px;
+    color: #999;
+    margin-left: 8px;
+}
+
+.empty-text {
+    color: #999;
+    font-style: italic;
+}

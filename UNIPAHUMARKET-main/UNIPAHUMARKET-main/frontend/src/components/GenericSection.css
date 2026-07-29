@@ -1,0 +1,31 @@
+.generic-section-container {
+    padding-top: 40px;
+    padding-bottom: 60px;
+    display: flex;
+    justify-content: center;
+}
+
+.generic-card {
+    padding: 50px;
+    text-align: center;
+    max-width: 600px;
+    width: 100%;
+}
+
+.generic-icon-area {
+    margin-bottom: 20px;
+    font-size: 50px;
+    color: #ddd;
+}
+
+.generic-card h2 {
+    font-size: 24px;
+    color: #333;
+    margin-bottom: 10px;
+}
+
+.generic-msg {
+    font-size: 16px;
+    color: #666;
+    margin-bottom: 30px;
+}

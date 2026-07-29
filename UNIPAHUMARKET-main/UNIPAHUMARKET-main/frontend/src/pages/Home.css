@@ -1,0 +1,162 @@
+.home-container {
+    padding-bottom: 50px;
+}
+
+.hero-banner {
+    width: 100%;
+    height: 340px;
+    /* Tamaño aproximado del carrusel */
+    background: linear-gradient(to bottom, #fff159 80%, #ebebeb 80%);
+    /* Simula la continuación del header */
+    display: flex;
+    justify-content: center;
+    position: relative;
+    overflow: hidden;
+}
+
+.banner-content {
+    background: linear-gradient(90deg, #A90F90 35%, #0C1A51 100%);
+    /* Colores promo ejemplo */
+    width: 100%;
+    max-width: 1200px;
+    margin: 0 10px;
+    border-radius: 4px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: white;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+    height: 280px;
+    /* Un poco menos que el contenedor */
+    margin-top: 10px;
+    z-index: 1;
+}
+
+.banner-text {
+    text-align: center;
+}
+
+.banner-text h2 {
+    font-size: 40px;
+    font-weight: 800;
+    margin-bottom: 10px;
+}
+
+.mt-4 {
+    margin-top: -20px;
+    /* Superponer un poco */
+    position: relative;
+    z-index: 2;
+}
+
+.payment-methods-bar {
+    display: flex;
+    justify-content: space-between;
+    padding: 20px;
+    margin-bottom: 40px;
+}
+
+.pm-item {
+    display: flex;
+    align-items: center;
+    gap: 15px;
+    font-size: 14px;
+    color: #333;
+    cursor: pointer;
+    flex: 1;
+}
+
+.pm-text {
+    display: flex;
+    flex-direction: column;
+}
+
+.pm-text strong {
+    font-weight: 600;
+    color: #333;
+}
+
+.pm-text span {
+    font-size: 12px;
+    color: #3483fa;
+}
+
+.pm-icon {
+    font-size: 28px;
+    background: #f5f5f5;
+    width: 45px;
+    height: 45px;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.section-title {
+    font-size: 24px;
+    color: #666;
+    font-weight: 300;
+    margin-bottom: 20px;
+}
+
+.products-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(224px, 1fr));
+    gap: 20px;
+}
+
+.product-card {
+    display: flex;
+    flex-direction: column;
+    height: 100%;
+    transition: box-shadow 0.2s;
+    text-decoration: none;
+    color: inherit;
+}
+
+.product-card:hover {
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+}
+
+.product-img-container {
+    height: 224px;
+    border-bottom: 1px solid #eee;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 10px;
+}
+
+.product-img-container img {
+    max-height: 100%;
+    max-width: 100%;
+    object-fit: contain;
+}
+
+.product-info {
+    padding: 20px;
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+}
+
+.product-price {
+    font-size: 24px;
+    font-weight: 400;
+    color: #333;
+    margin-bottom: 5px;
+}
+
+.shipping-free {
+    font-size: 12px;
+    font-weight: 600;
+    color: var(--green-ms);
+    margin-bottom: 10px;
+}
+
+.product-title {
+    font-size: 14px;
+    color: var(--text-secondary);
+    line-height: 1.3;
+    font-weight: 300;
+}

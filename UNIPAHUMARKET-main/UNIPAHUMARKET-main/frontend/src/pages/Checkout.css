@@ -1,0 +1,241 @@
+.checkout-container {
+    display: flex;
+    gap: 30px;
+    padding-top: 30px;
+    padding-bottom: 50px;
+}
+
+@media (max-width: 800px) {
+    .checkout-container {
+        flex-direction: column;
+    }
+}
+
+.checkout-main {
+    flex: 2;
+}
+
+.checkout-sidebar {
+    flex: 1;
+    max-width: 400px;
+}
+
+@media (max-width: 800px) {
+    .checkout-sidebar {
+        max-width: 100%;
+        order: -1;
+        /* Show summary first on mobile? Usually top or bottom. */
+    }
+}
+
+.checkout-step-content {
+    background: #fff;
+    padding: 30px;
+    border-radius: 6px;
+    box-shadow: 0 1px 2px 0 rgba(0, 0, 0, .12);
+}
+
+.step-title {
+    font-size: 24px;
+    margin-bottom: 24px;
+    color: #333;
+}
+
+/* Option Cards (Address / Payment) */
+.options-list {
+    margin-bottom: 24px;
+}
+
+.option-card {
+    display: flex;
+    padding: 20px;
+    border: 1px solid #e6e6e6;
+    border-radius: 6px;
+    margin-bottom: 15px;
+    cursor: pointer;
+    transition: all 0.2s;
+    background: #fff;
+}
+
+.option-card:hover {
+    background-color: #f9f9f9;
+}
+
+.option-card.selected {
+    border-color: #3483fa;
+    background-color: #f7faff;
+}
+
+.option-radio {
+    margin-right: 15px;
+    display: flex;
+    align-items: center;
+}
+
+.option-details {
+    flex: 1;
+}
+
+.option-header {
+    display: flex;
+    justify-content: space-between;
+    margin-bottom: 5px;
+}
+
+.option-name {
+    font-size: 16px;
+    font-weight: 600;
+}
+
+.sub-text {
+    color: #666;
+    font-size: 13px;
+    line-height: 1.4;
+}
+
+.green-text {
+    color: #00a650;
+}
+
+/* Card Form */
+.card-form {
+    background: #fdfdfd;
+    padding: 20px;
+    border: 1px solid #eee;
+    border-radius: 6px;
+    margin-bottom: 20px;
+}
+
+.animated-fade-in {
+    animation: fadeIn 0.3s ease-out;
+}
+
+@keyframes fadeIn {
+    from {
+        opacity: 0;
+        transform: translateY(-10px);
+    }
+
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+.card-form input {
+    width: 100%;
+    padding: 12px;
+    margin-bottom: 15px;
+    border: 1px solid #ccc;
+    border-radius: 4px;
+    font-size: 16px;
+}
+
+.form-row {
+    display: flex;
+    gap: 15px;
+}
+
+.form-row input {
+    flex: 1;
+}
+
+.saved-cards-section {
+    margin-bottom: 30px;
+}
+
+.saved-cards-section h3 {
+    font-size: 16px;
+    margin-bottom: 15px;
+    color: #333;
+}
+
+/* Review Step */
+.review-block {
+    margin-bottom: 20px;
+}
+
+.review-item {
+    display: flex;
+    gap: 15px;
+    padding: 20px 0;
+    border-bottom: 1px solid #eee;
+}
+
+.review-icon {
+    color: #999;
+}
+
+.review-text {
+    flex: 1;
+}
+
+.review-text strong {
+    display: block;
+    margin-bottom: 5px;
+    font-size: 16px;
+}
+
+.review-text p {
+    color: #666;
+    font-size: 14px;
+    margin-bottom: 4px;
+}
+
+.btn-link {
+    background: none;
+    border: none;
+    color: #3483fa;
+    font-size: 14px;
+    cursor: pointer;
+    align-self: flex-start;
+}
+
+/* Sidebar Summary */
+.summary-card {
+    padding: 20px;
+}
+
+.summary-card h3 {
+    margin-bottom: 20px;
+    font-size: 18px;
+    color: #333;
+}
+
+.summary-row {
+    display: flex;
+    justify-content: space-between;
+    margin-bottom: 12px;
+    font-size: 14px;
+    color: #666;
+}
+
+.summary-total {
+    display: flex;
+    justify-content: space-between;
+    margin-top: 15px;
+    font-size: 20px;
+    font-weight: 600;
+    color: #333;
+}
+
+.safe-buy-badge {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    margin-top: 20px;
+    font-size: 12px;
+    color: #999;
+}
+
+.step-actions {
+    margin-top: 30px;
+    display: flex;
+    justify-content: flex-end;
+}
+
+.big-btn {
+    width: 100%;
+    padding: 15px;
+    font-size: 18px;
+}

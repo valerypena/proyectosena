@@ -1,0 +1,429 @@
+/* Base Header (White) */
+.nav-header {
+    background-color: #fff;
+    border-bottom: 1px solid #e6e6e6;
+    padding-top: 0;
+    padding-bottom: 10px;
+}
+
+/* Orange Top Strip */
+.nav-top-strip {
+    background-color: var(--uninpahu-orange);
+    color: white;
+    font-size: 13px;
+    padding: 6px 0;
+    margin-bottom: 12px;
+}
+
+.header-container {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+}
+
+.nav-top {
+    display: flex;
+    align-items: center;
+    gap: 40px;
+}
+
+/* New Logo Styling */
+.nav-logo {
+    display: flex;
+    align-items: center;
+    text-decoration: none;
+}
+
+.nav-logo-img {
+    height: 48px;
+    max-width: 180px;
+    object-fit: contain;
+    mix-blend-mode: multiply;
+    transition: transform 0.2s ease;
+}
+
+.nav-logo:hover .nav-logo-img {
+    transform: scale(1.03);
+}
+
+/* Search Bar */
+.nav-search {
+    flex: 1;
+    display: flex;
+    background: #fff;
+    border: 1px solid #ddd;
+    border-radius: 4px;
+    height: 38px;
+    max-width: 600px;
+    overflow: hidden;
+}
+
+.nav-search-input {
+    flex: 1;
+    border: none;
+    padding: 10px 15px;
+    font-size: 16px;
+    outline: none;
+    color: #333;
+}
+
+.nav-search-btn {
+    background: var(--uninpahu-orange);
+    padding: 0 16px;
+    border: none;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+}
+
+.nav-search-btn svg {
+    color: white !important;
+}
+
+/* SEARCH SUGGESTIONS */
+.nav-search-container {
+    flex: 1;
+    position: relative;
+    max-width: 600px;
+}
+
+.search-suggestions-dropdown {
+    position: absolute;
+    top: 100%;
+    left: 0;
+    right: 0;
+    background: white;
+    border-bottom-left-radius: 4px;
+    border-bottom-right-radius: 4px;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+    z-index: 10000;
+    border: 1px solid #ddd;
+    border-top: none;
+    margin-top: -1px;
+}
+
+.search-suggestions-dropdown ul {
+    list-style: none;
+    padding: 8px 0;
+    margin: 0;
+}
+
+.search-suggestions-dropdown li {
+    padding: 10px 15px;
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    cursor: pointer;
+    font-size: 14px;
+    color: #333;
+    transition: background 0.2s;
+}
+
+.search-suggestions-dropdown li:hover {
+    background-color: #f5f5f5;
+}
+
+.search-suggestions-dropdown li span {
+    flex: 1;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+
+.nav-add-text {
+    font-size: 14px;
+    color: #333;
+}
+
+/* Bottom Nav */
+.nav-bottom {
+    display: flex;
+    align-items: flex-end;
+    justify-content: space-between;
+    padding-top: 4px;
+}
+
+/* Navigation Links */
+.nav-links {
+    display: flex;
+    gap: 25px;
+    font-size: 14px;
+    font-weight: 500;
+    color: #333;
+}
+
+.nav-links a {
+    color: #333;
+    transition: color 0.2s;
+}
+
+.nav-links a:hover {
+    color: var(--uninpahu-orange);
+}
+
+/* Account & Cart */
+.nav-account {
+    display: flex;
+    align-items: center;
+    gap: 15px;
+    font-size: 13px;
+    color: #333;
+}
+
+.nav-cart {
+    color: #333;
+}
+
+/* Dropdown CSS - REFINED for Gap Fix */
+.nav-item-dropdown {
+    position: relative;
+    padding-bottom: 20px;
+    /* Extends the hover area downwards to meet the menu */
+    margin-bottom: -20px;
+    /* Compensate layout */
+    display: flex;
+    align-items: center;
+    /* Ensure vertical center */
+}
+
+/* The Menu itself */
+.dropdown-menu {
+    display: none;
+    position: absolute;
+    top: 100%;
+    left: -10px;
+    /* Slight offset */
+    z-index: 5000;
+    min-width: 250px;
+    background-color: #fff;
+    box-shadow: 0 8px 24px rgba(0, 0, 0, 0.12);
+    border-radius: 6px;
+    padding: 8px 0;
+    margin-top: 5px;
+    /* Small visual gap, bridged by parent padding */
+    border: 1px solid #eee;
+}
+
+/* Show on hover */
+.nav-item-dropdown:hover .dropdown-menu {
+    display: block;
+}
+
+.dropdown-menu ul {
+    list-style: none;
+    padding: 0;
+    margin: 0;
+}
+
+.dropdown-menu li a {
+    display: block;
+    padding: 12px 20px;
+    color: #333;
+    text-decoration: none;
+    font-size: 14px;
+    transition: all 0.1s;
+    border-left: 3px solid transparent;
+}
+
+.dropdown-menu li a:hover {
+    background-color: #fff8f5;
+    color: var(--uninpahu-orange);
+    border-left-color: var(--uninpahu-orange);
+    padding-left: 25px;
+    /* Hover animation */
+}
+
+/* --- PROFILE DROPDOWN (Click or Hover) --- */
+.nav-profile-menu {
+    position: relative;
+    cursor: pointer;
+    font-size: 13px;
+    color: #333;
+}
+
+/* Invisible bridge for hover stability if using hover, 
+   but we'll use click/state in React for robustness or simple hover for desktop */
+.nav-profile-menu:hover .profile-dropdown-content {
+    display: block;
+}
+
+.nav-profile-trigger {
+    display: flex;
+    align-items: center;
+    gap: 5px;
+}
+
+.avatar-circle-sm {
+    width: 24px;
+    height: 24px;
+    border-radius: 50%;
+    background-color: #ddd;
+    color: #555;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 12px;
+    font-weight: bold;
+    overflow: hidden;
+}
+
+.arrow-icon {
+    font-size: 10px;
+    color: #999;
+}
+
+.profile-dropdown-content {
+    display: none;
+    position: absolute;
+    top: 100%;
+    right: 0;
+    /* Align right to not overflow screen */
+    width: 300px;
+    background-color: #fff;
+    box-shadow: 0 8px 16px rgba(0, 0, 0, 0.15);
+    border-radius: 6px;
+    z-index: 6000;
+    border: 1px solid #ebebeb;
+    padding-bottom: 5px;
+    margin-top: 10px;
+    /* Slight gap */
+}
+
+/* Invisible bridge to prevent closing when moving mouse across the gap */
+.nav-profile-menu::after {
+    content: "";
+    position: absolute;
+    top: 100%;
+    right: 0;
+    width: 300px;
+    height: 15px;
+    background: transparent;
+    display: none;
+}
+
+.nav-profile-menu:hover::after {
+    display: block;
+}
+
+/* Triangle/Arrow on top */
+.profile-dropdown-content::before {
+    content: "";
+    position: absolute;
+    top: -6px;
+    right: 20px;
+    width: 0;
+    height: 0;
+    border-left: 6px solid transparent;
+    border-right: 6px solid transparent;
+    border-bottom: 6px solid #fff;
+}
+
+.profile-menu-header {
+    display: flex;
+    gap: 15px;
+    padding: 20px;
+    border-bottom: 1px solid #eee;
+    background-color: #fcfcfc;
+    border-top-left-radius: 6px;
+    border-top-right-radius: 6px;
+}
+
+.avatar-large-menu {
+    width: 45px;
+    height: 45px;
+    border-radius: 50%;
+    background-color: #eee;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 20px;
+    color: #555;
+    border: 1px solid #ddd;
+}
+
+.header-info {
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+}
+
+.header-name {
+    font-weight: 600;
+    font-size: 14px;
+    color: #333;
+}
+
+.header-link {
+    font-size: 12px;
+    color: #333;
+    text-decoration: none;
+    margin-top: 2px;
+}
+
+.header-link:hover {
+    color: var(--uninpahu-orange);
+}
+
+.profile-dropdown-content hr {
+    border: 0;
+    border-top: 1px solid #eee;
+    margin: 5px 0;
+}
+
+.menu-item-link {
+    display: block;
+    padding: 10px 20px;
+    color: #333;
+    text-decoration: none;
+    font-size: 14px;
+    transition: background 0.1s;
+}
+
+.menu-item-link:hover {
+    background-color: #f5f5f5;
+}
+
+.menu-item-logout {
+    cursor: pointer;
+    color: #333;
+}
+
+.menu-item-logout:hover {
+    background-color: #f5f5f5;
+}
+
+/* MELI+ BANNER STYLE */
+.menu-meli-plus {
+    background: linear-gradient(90deg, #a90f90, #0c1a51);
+    margin: 10px 15px;
+    padding: 8px 12px;
+    border-radius: 4px;
+    color: white;
+    font-size: 13px;
+    font-weight: 600;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    cursor: pointer;
+}
+
+.badge-green {
+    background-color: #00a650;
+    color: white;
+    font-size: 10px;
+    font-weight: 800;
+    padding: 2px 6px;
+    border-radius: 4px;
+    margin-left: 5px;
+}
+
+.badge-blue {
+    background-color: #3483fa;
+    color: white;
+    font-size: 10px;
+    font-weight: 800;
+    padding: 2px 6px;
+    border-radius: 4px;
+    margin-left: 5px;
+}
