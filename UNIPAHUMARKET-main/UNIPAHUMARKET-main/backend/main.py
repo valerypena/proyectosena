@@ -53,6 +53,9 @@ app.add_middleware(
     allow_headers=["*"],
 )
 
+import os
+from fastapi.staticfiles import StaticFiles
+
 # Incluir Routers
 app.include_router(users.router)   # /auth/registro, /auth/token
 app.include_router(public.router)  # /productos, /categorias
@@ -62,6 +65,8 @@ app.include_router(reviews.router) # /resenas/...
 app.include_router(user_details.router) # /perfil/direcciones, /perfil/tarjetas
 app.include_router(questions.router) # /preguntas/...
 
-@app.get("/")
-def root():
-    return {"mensaje": "Bienvenido a la API de UNIMARKET", "estado": "funcionando"}
+# Servir archivos estáticos del Frontend
+frontend_path = os.path.join(os.path.dirname(__file__), "..", "frontend", "dist")
+if os.path.exists(frontend_path):
+    app.mount("/", StaticFiles(directory=frontend_path, html=True), name="frontend")
+
