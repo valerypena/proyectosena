@@ -1,13 +1,17 @@
+import sys
+if hasattr(sys.stdout, 'reconfigure'):
+    try:
+        sys.stdout.reconfigure(encoding='utf-8')
+    except Exception:
+        pass
+
 import redis
 import json
-import os
-from dotenv import load_dotenv
+from config import settings
 
-load_dotenv()
-
-REDIS_HOST = os.getenv("REDIS_HOST", "localhost")
-REDIS_PORT = int(os.getenv("REDIS_PORT", 6379))
-REDIS_DB = int(os.getenv("REDIS_DB", 0))
+REDIS_HOST = settings.REDIS_HOST
+REDIS_PORT = settings.REDIS_PORT
+REDIS_DB = settings.REDIS_DB
 
 class RedisCache:
     def __init__(self):
@@ -23,9 +27,9 @@ class RedisCache:
             # Verificar conexión
             self.client.ping()
             self.enabled = True
-            print("✅ Conectado a Redis exitosamente.")
+            print("--> Conectado a Redis exitosamente.")
         except Exception as e:
-            print(f"⚠️ Redis no disponible: {e}. El sistema funcionará sin caché.")
+            print(f"[!] Redis no disponible ({e}). El sistema funcionara sin cache.")
             self.enabled = False
 
     def get(self, key: str):
@@ -53,15 +57,20 @@ class RedisCache:
         except:
             pass
 
-    def invalidate_all_products(self):
-        """Borra todas las keys relacionadas con productos"""
+    def delete_pattern(self, pattern: str):
+        """Elimina todas las claves que coincidan con el patrón dado"""
         if not self.enabled:
             return
         try:
-            keys = self.client.keys("productos:*")
+            keys = self.client.keys(pattern)
             if keys:
                 self.client.delete(*keys)
-        except:
+        except Exception:
             pass
+
+    def invalidate_all_products(self):
+        """Borra todas las keys relacionadas con productos y sugerencias de búsqueda"""
+        self.delete_pattern("productos:*")
+        self.delete_pattern("sugerencias:*")
 
 cache = RedisCache()

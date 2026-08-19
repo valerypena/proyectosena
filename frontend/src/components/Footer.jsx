@@ -31,6 +31,7 @@ const Footer = () => {
                         <li><Link to="/afiliados">Programa de afiliados</Link></li>
                         <li><Link to="/ofertas">Ofertas especiales</Link></li>
                         <li><Link to="/ayuda">Centro de ayuda</Link></li>
+                        <li><Link to="/admin/microservices">🎛️ Panel de Microservicios</Link></li>
                     </ul>
                 </div>
 

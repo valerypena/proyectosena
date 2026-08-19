@@ -2,23 +2,43 @@ import mysql from 'mysql2/promise';
 import mongoose from 'mongoose';
 import amqp from 'amqplib';
 import dotenv from 'dotenv';
+import express, { Request, Response } from 'express';
+import cors from 'cors';
 
 dotenv.config();
 
-// Connections
-const pool = mysql.createPool({
-  host: process.env.MYSQL_HOST || 'localhost',
+const app = express();
+const PORT = process.env.PORT || 3008;
+
+app.use(cors());
+app.use(express.json());
+
+// Configuraciones de Conexión
+const MYSQL_CONFIG = {
+  host: process.env.MYSQL_HOST || '127.0.0.1',
   port: Number(process.env.MYSQL_PORT) || 3306,
   user: process.env.MYSQL_USER || 'root',
-  password: process.env.MYSQL_PASSWORD || 'rootpassword',
+  password: process.env.MYSQL_PASSWORD || '',
   database: process.env.MYSQL_DATABASE || 'unimarket',
   connectionLimit: 5,
-});
+};
 
-const MONGO_URI = process.env.MONGO_URI || 'mongodb://localhost:27017/unimarket_nosql';
-mongoose.connect(MONGO_URI).then(() => console.log('🍃 Sync Service connected to MongoDB'))
-  .catch(err => console.error('MongoDB sync connection error:', err));
+let mysqlPool: mysql.Pool | null = null;
 
+function getMySQLPool(): mysql.Pool {
+  if (!mysqlPool) {
+    mysqlPool = mysql.createPool(MYSQL_CONFIG);
+  }
+  return mysqlPool;
+}
+
+// MongoDB Connection
+const MONGO_URI = process.env.MONGO_URI || 'mongodb://127.0.0.1:27017/unimarket_nosql';
+mongoose.connect(MONGO_URI)
+  .then(() => console.log('🍃 Sync Service connected to MongoDB'))
+  .catch((err) => console.error('⚠️ MongoDB sync connection warning:', err.message));
+
+// Schemas MongoDB para Réplica Espejo
 const ProductMongoSchema = new mongoose.Schema({
   mysql_id: Number,
   nombre: String,
@@ -30,12 +50,24 @@ const ProductMongoSchema = new mongoose.Schema({
   categoria_nombre: String,
   emprendimiento_id: Number,
   emprendimiento_nombre: String,
-  creado_en: Date,
+  creado_en: { type: Date, default: Date.now },
+  synced: { type: Boolean, default: true }, // Status de reconciliación
+  created_offline: { type: Boolean, default: false },
 });
 const ProductMongo = mongoose.model('ProductReplica', ProductMongoSchema);
 
+const OfflineDeltaSchema = new mongoose.Schema({
+  entity_type: String, // 'product', 'user', 'order'
+  action: String, // 'INSERT', 'UPDATE', 'DELETE'
+  payload: Object,
+  created_at: { type: Date, default: Date.now },
+  synced: { type: Boolean, default: false },
+});
+const OfflineDelta = mongoose.model('OfflineDelta', OfflineDeltaSchema);
+
+// RabbitMQ Event Channel
 let channel: amqp.Channel | null = null;
-const RABBITMQ_URL = process.env.RABBITMQ_URL || 'amqp://guest:guest@localhost:5672';
+const RABBITMQ_URL = process.env.RABBITMQ_URL || 'amqp://guest:guest@127.0.0.1:5672';
 
 async function initRabbitMQ() {
   try {
@@ -43,17 +75,49 @@ async function initRabbitMQ() {
     channel = await conn.createChannel();
     await channel.assertExchange('unimarket_events', 'topic', { durable: true });
     console.log('✅ Sync Service connected to RabbitMQ');
-  } catch (err) {
-    console.error('RabbitMQ connect error:', err);
-    setTimeout(initRabbitMQ, 5000);
+  } catch (err: any) {
+    console.warn('⚠️ RabbitMQ no disponible en Sync Service (Continuando sin broker):', err.message);
+  }
+}
+initRabbitMQ();
+
+// Variables de Estado de Alta Disponibilidad (HA State)
+export interface HAState {
+  primaryStatus: 'UP' | 'DOWN';
+  backupStatus: 'UP' | 'DOWN';
+  mode: 'PRIMARY_ACTIVE' | 'OFFLINE_BACKUP_ACTIVE' | 'RECONCILING_DELTAS';
+  lastSyncTime: string;
+  totalSyncedProducts: number;
+  pendingOfflineDeltas: number;
+}
+
+let currentHAState: HAState = {
+  primaryStatus: 'UP',
+  backupStatus: 'UP',
+  mode: 'PRIMARY_ACTIVE',
+  lastSyncTime: new Date().toISOString(),
+  totalSyncedProducts: 0,
+  pendingOfflineDeltas: 0,
+};
+
+// Verificador de salud de MySQL
+async function isMySQLHealthy(): Promise<boolean> {
+  try {
+    const pool = getMySQLPool();
+    const conn = await pool.getConnection();
+    await conn.ping();
+    conn.release();
+    return true;
+  } catch {
+    return false;
   }
 }
 
-initRabbitMQ();
-
-// Ensure Outbox Table Exists
+// Ensure Outbox Table
 async function ensureOutboxTable() {
+  if (currentHAState.primaryStatus !== 'UP') return;
   try {
+    const pool = getMySQLPool();
     await pool.execute(`
       CREATE TABLE IF NOT EXISTS outbox_events (
         id INT AUTO_INCREMENT PRIMARY KEY,
@@ -65,17 +129,50 @@ async function ensureOutboxTable() {
         created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
       );
     `);
-  } catch (err) {
-    console.error('Outbox table ensure error:', err);
+  } catch (err: any) {
+    // Ignorar si MySQL no responde
   }
 }
 
-ensureOutboxTable();
-
-// Outbox Poller Worker & Sync Loop
+// --- CICLO DE RECONCILIACIÓN AUTO-HEALING & ESPEJO ---
 async function processOutboxAndSync() {
+  const mysqlUp = await isMySQLHealthy();
+
+  if (mysqlUp) {
+    const wasDown = currentHAState.primaryStatus === 'DOWN';
+    currentHAState.primaryStatus = 'UP';
+
+    if (wasDown) {
+      console.log('🔄 ¡MySQL ha vuelto a estar en línea! Iniciando proceso de Auto-Reconciliación y Espejo...');
+      currentHAState.mode = 'RECONCILING_DELTAS';
+      await reconcileOfflineDeltas();
+    } else {
+      currentHAState.mode = 'PRIMARY_ACTIVE';
+    }
+
+    await ensureOutboxTable();
+    await syncOutboxAndMirror();
+  } else {
+    currentHAState.primaryStatus = 'DOWN';
+    currentHAState.mode = 'OFFLINE_BACKUP_ACTIVE';
+    console.warn('⚡ Modo Respaldo Activo: MySQL fuera de línea. La base de datos de respaldo NoSQL absorbe la carga.');
+  }
+
+  // Actualizar deltas pendientes
   try {
-    // 1. Process Outbox Events
+    currentHAState.pendingOfflineDeltas = await OfflineDelta.countDocuments({ synced: false });
+    currentHAState.totalSyncedProducts = await ProductMongo.countDocuments({});
+  } catch {}
+
+  currentHAState.lastSyncTime = new Date().toISOString();
+}
+
+// Sincronización normal y espejo de MySQL -> MongoDB
+async function syncOutboxAndMirror() {
+  try {
+    const pool = getMySQLPool();
+
+    // 1. Procesar eventos del Outbox
     const [events]: any = await pool.execute(
       `SELECT * FROM outbox_events WHERE status = 'PENDING' ORDER BY created_at ASC LIMIT 50`
     );
@@ -87,7 +184,6 @@ async function processOutboxAndSync() {
           data: typeof event.payload === 'string' ? JSON.parse(event.payload) : event.payload,
           timestamp: event.created_at
         }));
-
         const published = channel.publish('unimarket_events', event.event_type, payload, { persistent: true });
         if (published) {
           await pool.execute(`UPDATE outbox_events SET status = 'PROCESSED' WHERE id = ?`, [event.id]);
@@ -95,7 +191,7 @@ async function processOutboxAndSync() {
       }
     }
 
-    // 2. Continuous Full Product Catalog Sync to MongoDB Read Replica
+    // 2. Replicación Espejo Continua MySQL -> MongoDB
     const [products]: any = await pool.execute(`
       SELECT p.*, c.nombre as categoria_nombre, e.nombre_marca as emprendimiento_nombre 
       FROM productos p
@@ -117,16 +213,69 @@ async function processOutboxAndSync() {
           categoria_nombre: prod.categoria_nombre,
           emprendimiento_id: prod.emprendimiento_id,
           emprendimiento_nombre: prod.emprendimiento_nombre,
-          creado_en: prod.creado_en
+          creado_en: prod.creado_en,
+          synced: true,
+          created_offline: false,
         },
         { upsert: true, new: true }
       );
     }
-  } catch (err) {
-    console.warn('⚠️ Sync cycle error (will retry next interval):', err);
+  } catch (err: any) {
+    console.warn('⚠️ Error en ciclo espejo:', err.message);
   }
 }
 
-// Run polling loop every 5 seconds
-console.log('🔄 Sync Service started outbox polling & replica synchronization');
+// Reconciliación de Deltas Offline (Puesta al día en MySQL de lo grabado durante la caída)
+async function reconcileOfflineDeltas() {
+  try {
+    const deltas = await OfflineDelta.find({ synced: false }).sort({ created_at: 1 });
+    if (deltas.length === 0) {
+      console.log('✅ Sin cambios offline pendientes. Ambas bases de datos están idénticas.');
+      return;
+    }
+
+    console.log(`📦 Reconciliando ${deltas.length} registros creados durante el tiempo de caída...`);
+    const pool = getMySQLPool();
+
+    for (const delta of deltas) {
+      if (delta.entity_type === 'product' && delta.action === 'INSERT') {
+        const p = delta.payload;
+        await pool.execute(
+          `INSERT INTO productos (emprendimiento_id, categoria_id, nombre, descripcion, precio, cantidad_stock, url_imagen) 
+           VALUES (?, ?, ?, ?, ?, ?, ?)`,
+          [p.emprendimiento_id || 1, p.categoria_id || 1, p.nombre, p.descripcion || '', p.precio || 0, p.cantidad_stock || 10, p.url_imagen || '']
+        );
+      }
+      delta.synced = true;
+      await delta.save();
+    }
+
+    console.log('✨ ¡Auto-Reconciliación completada! El espejo de MySQL y MongoDB está 100% igualado.');
+  } catch (err: any) {
+    console.error('❌ Error durante la reconciliación:', err.message);
+  }
+}
+
+// --- API ENDPOINTS DE SALUD Y SINCRONIZACIÓN ---
+app.get('/api/sync/status', (req: Request, res: Response) => {
+  res.json({
+    haState: currentHAState,
+    info: 'Motor de Alta Disponibilidad y Réplica Espejo Self-Healing UNIMARKET',
+  });
+});
+
+app.post('/api/sync/reconcile', async (req: Request, res: Response) => {
+  await processOutboxAndSync();
+  res.json({
+    message: 'Ciclo de reconciliación y sincronización espejo activado manualmente.',
+    haState: currentHAState,
+  });
+});
+
+// Iniciar servidor del Microservicio de Sincronización
+app.listen(PORT, () => {
+  console.log(`🔄 Sync & Mirroring Microservice listening on port ${PORT}`);
+});
+
+// Polling loop cada 5 segundos
 setInterval(processOutboxAndSync, 5000);

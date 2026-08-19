@@ -5,19 +5,15 @@ import bcrypt
 from fastapi.security import OAuth2PasswordBearer
 from fastapi import Depends, HTTPException, status
 from sqlalchemy.orm import Session
-import os
-from dotenv import load_dotenv
-
+from config import settings
 from database import get_db
 from models import Usuario
 import schemas
 
-load_dotenv()
-
-# Configuración
-SECRET_KEY = os.getenv("SECRET_KEY", "secreto_super_seguro_por_defecto")
-ALGORITHM = os.getenv("ALGORITHM", "HS256")
-ACCESS_TOKEN_EXPIRE_MINUTES = int(os.getenv("ACCESS_TOKEN_EXPIRE_MINUTES", 30))
+# Configuración desde settings centralizados
+SECRET_KEY = settings.SECRET_KEY
+ALGORITHM = settings.ALGORITHM
+ACCESS_TOKEN_EXPIRE_MINUTES = settings.ACCESS_TOKEN_EXPIRE_MINUTES
 
 # La URL del token debe ser absoluta o correcta relativa
 oauth2_scheme = OAuth2PasswordBearer(tokenUrl="/auth/token")

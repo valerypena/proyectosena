@@ -1,3 +1,10 @@
+import sys
+if hasattr(sys.stdout, 'reconfigure'):
+    try:
+        sys.stdout.reconfigure(encoding='utf-8')
+    except Exception:
+        pass
+
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 from database import engine, Base
@@ -35,25 +42,28 @@ app = FastAPI(
     }
 )
 
-# Configuración de CORS (Permitir todo por ahora para desarrollo local)
-origins = [
-    "http://localhost:3000",
-    "http://localhost:5173", # Vite default port
-    "http://localhost:5174",
-    "http://localhost:5175",
-    "http://localhost:5176",
-    "*"
-]
+from config import settings
+import os
+from fastapi import Request
+from fastapi.responses import JSONResponse
+from sqlalchemy.exc import SQLAlchemyError
 
+# Configuración de CORS segura desde configuración
 app.add_middleware(
     CORSMiddleware,
-    allow_origins=origins,
+    allow_origins=settings.ALLOWED_ORIGINS,
     allow_credentials=True,
     allow_methods=["*"],
     allow_headers=["*"],
 )
 
-import os
+# Manejador global para errores de base de datos
+@app.exception_handler(SQLAlchemyError)
+async def sqlalchemy_exception_handler(request: Request, exc: SQLAlchemyError):
+    return JSONResponse(
+        status_code=500,
+        content={"detail": "Error en la capa de persistencia de datos. Operación abortada de forma segura."}
+    )
 from fastapi.staticfiles import StaticFiles
 
 # Incluir Routers
@@ -69,4 +79,8 @@ app.include_router(questions.router) # /preguntas/...
 frontend_path = os.path.join(os.path.dirname(__file__), "..", "frontend", "dist")
 if os.path.exists(frontend_path):
     app.mount("/", StaticFiles(directory=frontend_path, html=True), name="frontend")
+
+if __name__ == "__main__":
+    import uvicorn
+    uvicorn.run("main:app", host="127.0.0.1", port=8000, reload=True)
 

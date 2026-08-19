@@ -70,7 +70,12 @@ def actualizar_usuario(
     if usuario_update.ocupacion:
         current_user.ocupacion = usuario_update.ocupacion
 
-    if usuario_update.rol:
+    if usuario_update.rol is not None and usuario_update.rol != current_user.rol:
+        if current_user.rol != models.RolUsuario.ADMINISTRADOR:
+            raise HTTPException(
+                status_code=status.HTTP_403_FORBIDDEN,
+                detail="No tienes permisos para modificar tu rol de usuario"
+            )
         current_user.rol = usuario_update.rol
     
     if usuario_update.email and usuario_update.email != current_user.email:

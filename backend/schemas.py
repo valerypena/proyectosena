@@ -1,8 +1,18 @@
-from pydantic import BaseModel, EmailStr
+import re
+from pydantic import BaseModel, EmailStr, field_validator
 from typing import List, Optional
 from datetime import datetime
 from enum import Enum
 from decimal import Decimal
+
+# Función limpiadora XSS
+def sanitizar_texto(v: Optional[str]) -> Optional[str]:
+    if v is None or not isinstance(v, str):
+        return v
+    # Eliminar etiquetas script y cualquier tag HTML peligroso
+    cleaned = re.sub(r'<script.*?>.*?</script>', '', v, flags=re.IGNORECASE | re.DOTALL)
+    cleaned = re.sub(r'<[^>]*>', '', cleaned)
+    return cleaned.strip()
 
 # Enums
 class RolUsuarioEnum(str, Enum):
@@ -23,6 +33,13 @@ class UsuarioBase(BaseModel):
 class UsuarioCreate(UsuarioBase):
     contrasena: str
 
+    @field_validator('contrasena')
+    @classmethod
+    def validar_contrasena(cls, v: str) -> str:
+        if len(v) < 6:
+            raise ValueError('La contraseña debe tener al menos 6 caracteres')
+        return v
+
 class UsuarioLogin(BaseModel):
     email: EmailStr
     contrasena: str
@@ -34,6 +51,13 @@ class UsuarioUpdate(BaseModel):
     documento: Optional[str] = None
     ocupacion: Optional[str] = None
     rol: Optional[RolUsuarioEnum] = None
+
+    @field_validator('contrasena')
+    @classmethod
+    def validar_contrasena_update(cls, v: Optional[str]) -> Optional[str]:
+        if v is not None and len(v) < 6:
+            raise ValueError('La contraseña debe tener al menos 6 caracteres')
+        return v
 
 class UsuarioOut(UsuarioBase):
     id: int
@@ -119,6 +143,20 @@ class ProductoBase(BaseModel):
     url_imagen: Optional[str] = None
     categoria_id: Optional[int] = None
 
+    @field_validator('precio')
+    @classmethod
+    def validar_precio(cls, v: Decimal) -> Decimal:
+        if v <= 0:
+            raise ValueError('El precio debe ser mayor a cero')
+        return v
+
+    @field_validator('cantidad_stock')
+    @classmethod
+    def validar_stock(cls, v: int) -> int:
+        if v < 0:
+            raise ValueError('El stock no puede ser negativo')
+        return v
+
 class ProductoCreate(ProductoBase):
     # El emprendimiento se asocia automáticamente al usuario vendedor logueado
     pass
@@ -178,6 +216,13 @@ class ItemCarritoBase(BaseModel):
     producto_id: int
     cantidad: int
 
+    @field_validator('cantidad')
+    @classmethod
+    def validar_cantidad(cls, v: int) -> int:
+        if v <= 0:
+            raise ValueError('La cantidad debe ser mayor a cero')
+        return v
+
 class ItemCarritoCreate(ItemCarritoBase):
     pass
 
@@ -233,6 +278,13 @@ class CompraOut(CompraBase):
 class ResenaBase(BaseModel):
     calificacion: int
     comentario: Optional[str] = None
+
+    @field_validator('calificacion')
+    @classmethod
+    def validar_calificacion(cls, v: int) -> int:
+        if v < 1 or v > 5:
+            raise ValueError('La calificación debe estar entre 1 y 5')
+        return v
 
 class ResenaCreate(ResenaBase):
     compra_id: int # Para validar que compró el producto

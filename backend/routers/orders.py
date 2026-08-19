@@ -88,6 +88,8 @@ def vaciar_carrito(
 
 # --- ORDENES / CHECKOUT ---
 
+from redis_client import cache
+
 @router.post("/checkout", response_model=schemas.CompraOut)
 def realizar_compra(
     checkout_data: schemas.CheckoutRequest,
@@ -100,58 +102,73 @@ def realizar_compra(
     if not items_carrito:
         raise HTTPException(status_code=400, detail="El carrito está vacío")
     
-    # 2. Calcular total y validar stock nuevamente
-    monto_total = 0
-    items_compra_data = []
-    
-    for item in items_carrito:
-        producto = item.producto # Usamos la relación
-        if producto.cantidad_stock < item.cantidad:
-            raise HTTPException(
-                status_code=400, 
-                detail=f"Stock insuficiente para {producto.nombre}. Disponible: {producto.cantidad_stock}"
-            )
+    try:
+        # 2. Calcular total y validar stock bloqueando/consultando la información actual
+        monto_total = 0
+        items_compra_data = []
         
-        monto_total += (producto.precio * item.cantidad)
-        items_compra_data.append({
-            "producto": producto,
-            "cantidad": item.cantidad,
-            "precio": producto.precio
-        })
-    
-    # 3. Crear la Compra
-    nueva_compra = models.Compra(
-        usuario_id=current_user.id,
-        monto_total=monto_total,
-        estado=EstadoCompra.PENDIENTE,
-        direccion_id=checkout_data.direccion_id,
-        metodo_pago=checkout_data.metodo_pago
-    )
-    db.add(nueva_compra)
-    db.flush() # Para obtener el ID de la compra antes de commit
-    
-    # 4. Crear Items de Compra y Descontar Stock
-    for data in items_compra_data:
-        # Item de Compra
-        nuevo_item_compra = models.ItemCompra(
-            compra_id=nueva_compra.id,
-            producto_id=data["producto"].id,
-            cantidad=data["cantidad"],
-            precio_al_comprar=data["precio"]
+        for item in items_carrito:
+            producto = db.query(models.Producto).filter(models.Producto.id == item.producto_id).first()
+            if not producto:
+                raise HTTPException(status_code=404, detail="Uno de los productos ya no existe")
+            if producto.cantidad_stock < item.cantidad:
+                raise HTTPException(
+                    status_code=400, 
+                    detail=f"Stock insuficiente para {producto.nombre}. Disponible: {producto.cantidad_stock}"
+                )
+            
+            monto_total += (producto.precio * item.cantidad)
+            items_compra_data.append({
+                "producto": producto,
+                "cantidad": item.cantidad,
+                "precio": producto.precio
+            })
+        
+        # 3. Crear la Compra
+        nueva_compra = models.Compra(
+            usuario_id=current_user.id,
+            monto_total=monto_total,
+            estado=EstadoCompra.PENDIENTE,
+            direccion_id=checkout_data.direccion_id,
+            metodo_pago=checkout_data.metodo_pago
         )
-        db.add(nuevo_item_compra)
+        db.add(nueva_compra)
+        db.flush() # Para obtener el ID de la compra antes del commit
         
-        # Descontar Stock
-        data["producto"].cantidad_stock -= data["cantidad"]
-        db.add(data["producto"]) # Marcar como modificado
+        # 4. Crear Items de Compra y Descontar Stock
+        for data in items_compra_data:
+            nuevo_item_compra = models.ItemCompra(
+                compra_id=nueva_compra.id,
+                producto_id=data["producto"].id,
+                cantidad=data["cantidad"],
+                precio_al_comprar=data["precio"]
+            )
+            db.add(nuevo_item_compra)
+            
+            # Descontar Stock
+            data["producto"].cantidad_stock -= data["cantidad"]
+            db.add(data["producto"])
+            
+        # 5. Vaciar Carrito
+        for item in items_carrito:
+            db.delete(item)
+            
+        db.commit()
+        db.refresh(nueva_compra)
         
-    # 5. Vaciar Carrito
-    for item in items_carrito:
-        db.delete(item)
+        # 6. Invalidar caché para reflejar el nuevo inventario en tiempo real
+        cache.invalidate_all_products()
         
-    db.commit()
-    db.refresh(nueva_compra)
-    return nueva_compra
+        return nueva_compra
+    except HTTPException:
+        db.rollback()
+        raise
+    except Exception as e:
+        db.rollback()
+        raise HTTPException(
+            status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
+            detail=f"Error al procesar la compra: {str(e)}"
+        )
 
 @router.get("/mis-ordenes", response_model=List[schemas.CompraOut])
 def mis_ordenes(

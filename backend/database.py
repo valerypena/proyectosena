@@ -1,14 +1,9 @@
 from sqlalchemy import create_engine
 from sqlalchemy.ext.declarative import declarative_base
 from sqlalchemy.orm import sessionmaker
-import os
-from dotenv import load_dotenv
+from config import settings
 
-load_dotenv()
-
-# URL de conexión a la base de datos
-# Formato: mysql+pymysql://usuario:contraseña@servidor:puerto/nombre_base_datos
-SQLALCHEMY_DATABASE_URL = os.getenv("DATABASE_URL", "mysql+pymysql://root:@localhost:3306/unimarket")
+SQLALCHEMY_DATABASE_URL = settings.DATABASE_URL
 
 engine = create_engine(
     SQLALCHEMY_DATABASE_URL, 

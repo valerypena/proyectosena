@@ -15,11 +15,12 @@ Combina un **Monolito robusto en Python (FastAPI)** con una **Arquitectura distr
 
 ## 📐 Documentación Técnica y Diagramas UML
 
-Para consultar el diseño de software detallado y los patrones de arquitectura, revisa el documento especializado:
+Para consultar el diseño de software detallado y los patrones de arquitectura, revisa los documentos en la carpeta `docs/`:
 
-👉 **[Documentación Completa con Diagramas UML (docs/UML_DIAGRAMS.md)](docs/UML_DIAGRAMS.md)**
+👉 **[Documentación Completa con Diagramas UML (docs/UML_DIAGRAMS.md)](docs/UML_DIAGRAMS.md)**  
+👉 **[Esquema DDL de Base de Datos MySQL (docs/schema.sql)](docs/schema.sql)**
 
-### Diagramas UML Incluidos:
+### Diagramas UML Incluidos (Mermaid Format):
 1. **Diagrama de Casos de Uso** (*Use Case Diagram*)
 2. **Diagrama de Clases del Dominio** (*Class Diagram*)
 3. **Diagrama Entidad-Relación** (*ER Diagram / Modelo MySQL*)
@@ -42,11 +43,12 @@ Para consultar el diseño de software detallado y los patrones de arquitectura, 
 - **Peticiones HTTP**: Axios / Fetch API
 
 ### **Backend Core (Monolito FastAPI)**
-- **Framework**: Python 3.11 + FastAPI
-- **ORM / BD**: SQLAlchemy + MySQL Connector
+- **Framework**: Python 3.11+ / 3.12 + FastAPI
+- **Servidor ASGI**: Uvicorn (Arranque integrado vía `python main.py`)
+- **ORM / BD**: SQLAlchemy + PyMySQL
 - **Validación**: Pydantic v2
 - **Seguridad**: JWT (JSON Web Tokens) + Passlib (bcrypt)
-- **Generación de Reportes**: ReportLab (Generación dinámica de PDF)
+- **Generación de Reportes**: ReportLab (PDFs automatizados)
 
 ### **Microservicios (Node.js / TypeScript)**
 - **Runtime**: Node.js v18+
@@ -55,7 +57,7 @@ Para consultar el diseño de software detallado y los patrones de arquitectura, 
 - **Patrones de Resiliencia**: Opossum (Circuit Breaker Pattern)
 
 ### **Infraestructura y Persistencia**
-- **Base de Datos Relacional**: MySQL 8.0 (Catálogo, Usuarios, Compras, Reseñas)
+- **Base de Datos Relacional**: MySQL 8.0 / MariaDB (Catálogo, Usuarios, Compras, Reseñas)
 - **Base de Datos NoSQL**: MongoDB 6.0 (Servicios analíticos / registros)
 - **Caché In-Memory**: Redis 7.0 (Manejador de sesiones, listas blancas/negras JWT y Rate Limiting)
 - **Broker de Mensajería**: RabbitMQ (Event-Driven Architecture)
@@ -71,10 +73,11 @@ proyectosena/
  │    ├── models.py             # Modelos SQLAlchemy
  │    ├── schemas.py            # Esquemas Pydantic
  │    ├── database.py           # Conexión MySQL
- │    ├── redis_client.py       # Conexión y cliente Redis
+ │    ├── redis_client.py       # Conexión y cliente Redis (Con fallback tolerante)
  │    ├── auth.py               # Generación y validación JWT
+ │    ├── setup_full_db.py      # Script de inicialización y siembra masiva de BD
  │    ├── generate_*_pdf.py     # Módulos de generación de documentación PDF
- │    └── main.py               # Punto de entrada de la aplicación FastAPI
+ │    └── main.py               # Punto de entrada y servidor FastAPI / Uvicorn
  │
  ├── frontend/                  # Aplicación Web React + Vite
  │    ├── src/                  # Componentes, vistas, hooks y estilos
@@ -101,30 +104,32 @@ proyectosena/
 
 ---
 
-## 🚀 Guía de Instalación y Ejecución
+## 🚀 Guía de Instalación y Ejecución Rápida
 
 ### **1. Requisitos Previos**
-Asegúrate de tener instalados las siguientes herramientas en tu entorno:
 - [Node.js](https://nodejs.org/) (v18 o superior) y `npm`
 - [Python](https://www.python.org/) (v3.10 o superior) y `pip`
-- [MySQL Server](https://www.mysql.com/) (v8.0)
-- [Redis Server](https://redis.io/)
-- [RabbitMQ](https://www.rabbitmq.com/) *(opcional para ejecución distribuida)*
+- [MySQL Server](https://www.mysql.com/) / XAMPP (v8.0 en puerto 3306)
+- [Redis Server](https://redis.io/) *(opcional; el sistema funciona con fallback en memoria si no está activo)*
 
 ---
 
-### **2. Configuración de la Base de Datos**
-Crea la base de datos MySQL e importa la estructura definida en `docs/schema.sql`:
+### **2. Configuración y Siembra de la Base de Datos**
+
+#### Opción A: Automática vía Script (Recomendado)
+Abre tu terminal en `backend/` e inicia la base de datos con datos de prueba (700 productos en 14 categorías, 20 vendedores, usuarios y reseñas):
 
 ```bash
-# Iniciar sesión en MySQL
-mysql -u root -p
+cd backend
+python setup_full_db.py
+```
 
-# Crear base de datos
+#### Opción B: Manual vía SQL
+Importa el esquema en MySQL / phpMyAdmin mediante el archivo [`docs/schema.sql`](docs/schema.sql):
+
+```sql
 CREATE DATABASE unimarket CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;
 USE unimarket;
-
-# Importar esquema DDL
 SOURCE docs/schema.sql;
 ```
 
@@ -132,59 +137,40 @@ SOURCE docs/schema.sql;
 
 ### **3. Ejecución del Backend (FastAPI)**
 
-1. Entra a la carpeta backend e instala dependencias:
+1. Entra a la carpeta `backend/` e instala dependencias:
    ```bash
    cd backend
    pip install -r requirements.txt
    ```
 
-2. Configura las variables de entorno creando un archivo `.env` basado en `.env.example`:
+2. *(Opcional)* Configura `.env` basándote en `.env.example`:
    ```ini
-   DATABASE_URL=mysql+pymysql://root:password@localhost:3306/unimarket
-   REDIS_HOST=localhost
-   REDIS_PORT=6379
-   SECRET_KEY=tu_clave_secreta_jwt
+   DATABASE_URL="mysql+pymysql://root:@127.0.0.1:3306/unimarket"
+   SECRET_KEY="tu_clave_secreta_jwt"
    ```
 
-3. Inicia el servidor de desarrollo Uvicorn:
+3. Inicia el servidor directamente con Python:
    ```bash
    python main.py
    ```
-   *La API estará disponible en `http://localhost:8000` (Documentación Swagger interactiva en `http://localhost:8000/docs`).*
+   - **Backend API**: `http://127.0.0.1:8000`
+   - **Documentación Swagger UI**: `http://127.0.0.1:8000/docs`
 
 ---
 
-### **4. Ejecución del Frontend (React)**
+### **4. Ejecución del Frontend (React + Vite)**
 
-1. Navega a la carpeta del frontend:
+1. En una nueva terminal, navega a `frontend/`:
    ```bash
    cd frontend
    npm install
    ```
 
-2. Ejecuta el servidor de desarrollo de Vite:
+2. Inicia el servidor de desarrollo:
    ```bash
    npm run dev
    ```
-   *El frontend estará disponible en `http://localhost:5173`.*
-
----
-
-### **5. Ejecución del Paquete Compartido y Microservicios**
-
-1. Compila la librería `@unimarket/shared`:
-   ```bash
-   cd shared
-   npm install
-   npm run build
-   ```
-
-2. Inicia los microservicios deseados dentro de `services/`:
-   ```bash
-   cd services/api-gateway
-   npm install
-   npm run dev
-   ```
+   - **Aplicación Web**: `http://localhost:5173`
 
 ---
 
@@ -200,5 +186,5 @@ SOURCE docs/schema.sql;
 
 ## 📝 Licencia y Créditos
 
-Proyecto desarrollado como parte del programa de formación SENA / UNIMARKET. 
+Proyecto desarrollado como parte del programa de formación SENA / UNIMARKET.  
 Todos los derechos reservados.

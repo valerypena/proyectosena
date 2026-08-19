@@ -21,6 +21,7 @@ import ProfileAccount from './pages/ProfileAccount';
 import OrderDetail from './pages/OrderDetail';
 import VendorDashboard from './pages/VendorDashboard';
 import GenericSection from './components/GenericSection';
+import MicroservicesDashboard from './components/MicroservicesDashboard';
 
 import InfoPage from './components/InfoPage';
 import { Terms, Privacy, Accessibility } from './pages/Legal';
@@ -201,6 +202,10 @@ function App() {
           <Route path="/central-marketing" element={<PrivateRoute><GenericSection title="Central de Marketing" emptyMsg="Herramientas para potenciar tus ventas." /></PrivateRoute>} />
           <Route path="/metricas" element={<PrivateRoute><GenericSection title="Métricas" emptyMsg="No hay datos suficientes para mostrar métricas." /></PrivateRoute>} />
           <Route path="/facturacion" element={<PrivateRoute><GenericSection title="Facturación" emptyMsg="No tienes facturas pendientes." /></PrivateRoute>} />
+
+          {/* Panel de Control de Microservicios */}
+          <Route path="/admin/microservices" element={<MicroservicesDashboard />} />
+          <Route path="/microservicios" element={<MicroservicesDashboard />} />
 
           {/* Rutas no encontradas */}
           <Route path="*" element={<div className="container" style={{ padding: '50px', textAlign: 'center' }}><h2>404 - Página no encontrada</h2></div>} />

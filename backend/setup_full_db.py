@@ -1,3 +1,7 @@
+import sys
+import os
+if hasattr(sys.stdout, 'reconfigure'):
+    sys.stdout.reconfigure(encoding='utf-8')
 import pymysql
 import bcrypt
 import random
@@ -15,31 +19,40 @@ from dotenv import load_dotenv
 load_dotenv()
 
 # Configuración
-DATABASE_URL = os.getenv("DATABASE_URL", "mysql+pymysql://root:@localhost:3306/unimarket")
-DB_HOST = "localhost"
-DB_USER = "root"
-DB_PASSWORD = "" 
-DB_NAME = "unimarket"
+DATABASE_URL = os.getenv("DATABASE_URL", "mysql+pymysql://root:@127.0.0.1:3306/unimarket")
+DB_HOST = os.getenv("DB_HOST", "127.0.0.1")
+DB_USER = os.getenv("DB_USER", "root")
+DB_PASSWORD = os.getenv("DB_PASSWORD", "") 
+DB_NAME = os.getenv("DB_NAME", "unimarket")
 
 def hash_password(password):
     return bcrypt.hashpw(password.encode('utf-8'), bcrypt.gensalt()).decode('utf-8')
 
 def reset_database():
-    print(f"--- 🔄 Reiniciando Base de Datos: {DB_NAME} ---")
+    print(f"--- 🔄 Preparando Base de Datos: {DB_NAME} ---")
     try:
         conn = pymysql.connect(host=DB_HOST, user=DB_USER, password=DB_PASSWORD)
         cursor = conn.cursor()
-        cursor.execute(f"DROP DATABASE IF EXISTS {DB_NAME}")
-        cursor.execute(f"CREATE DATABASE {DB_NAME} CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci")
+        cursor.execute(f"CREATE DATABASE IF NOT EXISTS `{DB_NAME}` CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci")
         cursor.close()
         conn.close()
     except Exception as e:
-        print(f"❌ Error MySQL: {e}")
+        print(f"❌ Error al verificar/crear la base de datos MySQL: {e}")
         return False
     
-    Base.metadata.create_all(bind=engine)
-    print("✅ Base de datos recreada limpia.")
-    return True
+    try:
+        # Recrear tablas sin bloquear la base de datos completa
+        with engine.connect() as conn:
+            conn.exec_driver_sql("SET FOREIGN_KEY_CHECKS = 0;")
+            Base.metadata.drop_all(bind=engine)
+            Base.metadata.create_all(bind=engine)
+            conn.exec_driver_sql("SET FOREIGN_KEY_CHECKS = 1;")
+            conn.commit()
+        print("✅ Tablas de la base de datos creadas/recreadas limpias.")
+        return True
+    except Exception as e:
+        print(f"❌ Error al recrear tablas: {e}")
+        return False
 
 # --- GENERADORES DE DATOS ---
 
