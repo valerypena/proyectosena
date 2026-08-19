@@ -78,10 +78,8 @@ export const SidebarFilters = ({ totalCount = 0, title = 'Resultados' }) => {
 
     return (
         <aside className="sidebar-filters-container">
-            {/* Header / Título */}
+            {/* Conteo General Superior */}
             <div className="filter-header">
-                <h1 className="filter-main-title">{title}</h1>
-                <p className="filter-main-subtitle">¡Encuentra precios increíbles cada día!</p>
                 <div className="filter-total-products">
                     <strong>Todas</strong>
                     <span>{totalCount.toLocaleString('es-CO')} productos</span>
@@ -160,7 +158,7 @@ export const SidebarFilters = ({ totalCount = 0, title = 'Resultados' }) => {
             <div className="filter-section">
                 <h3 className="filter-title">Categorías</h3>
                 <ul className="filter-list categories-scroll-list">
-                    {categories.map((cat, idx) => {
+                    {categories.map((cat) => {
                         const isSelected = currentCategoryId === String(cat.id);
                         return (
                             <li
@@ -169,7 +167,7 @@ export const SidebarFilters = ({ totalCount = 0, title = 'Resultados' }) => {
                                 onClick={() => handleCategoryClick(cat.id)}
                             >
                                 <span className="cat-name">{cat.nombre}</span>
-                                <span className="filter-count">({((idx + 1) * 73 + 120)})</span>
+                                <span className="filter-count">({cat.cantidad_productos !== undefined ? cat.cantidad_productos : 0})</span>
                             </li>
                         );
                     })}

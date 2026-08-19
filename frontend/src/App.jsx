@@ -29,7 +29,7 @@ import { AuthProvider, AuthContext } from './context/AuthContext';
 import { ToastProvider } from './context/ToastContext';
 import { CartProvider } from './context/CartContext';
 
-// Content for static pages
+// Contenido estático
 const aboutContent = `
     <p>Market es la plataforma líder de comercio electrónico diseñada para conectar emprendimientos locales y compradores. Nuestra misión es fomentar el comercio digital y facilitar el intercambio de bienes y servicios.</p>
     <br/>
@@ -59,14 +59,6 @@ const affiliatesContent = `
     <p>Contacta a soporte@soporte.co para más información.</p>
 `;
 
-const termsContent = `
-    <h3>Términos y Condiciones de Uso</h3>
-    <p>Bienvenido a nuestra plataforma. Al usar este sitio, aceptas los siguientes términos...</p>
-    <p>1. <strong>Uso de la cuenta:</strong> Eres responsable de mantener la confidencialidad de tu cuenta.</p>
-    <p>2. <strong>Contenido prohibido:</strong> No se permite la venta de artículos ilegales, peligrosos o que violen derechos de propiedad intelectual.</p>
-    <p>3. <strong>Privacidad:</strong> Tus datos están protegidos según nuestra política de privacidad.</p>
-`;
-
 const PrivateRoute = ({ children }) => {
   const { token, loading } = useContext(AuthContext);
 
@@ -87,7 +79,9 @@ function App() {
               <Route path="/login" element={<Login />} />
               <Route path="/registro" element={<Register />} />
               <Route path="/items" element={<SearchResults />} />
+              <Route path="/ofertas" element={<SearchResults />} />
               <Route path="/producto/:id" element={<ProductDetail />} />
+              <Route path="/items/:id" element={<ProductDetail />} />
               <Route path="/categorias" element={<Categories />} />
               <Route path="/ayuda" element={<Ayuda />} />
               <Route path="/cart" element={<Cart />} />

@@ -90,24 +90,11 @@ const Navbar = () => {
 
     return (
         <header className="nav-header">
-            {/* Orange Strip at Top */}
-            <div className="nav-top-strip">
-                <div className="container" style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
-                    <div
-                        className="nav-location"
-                        onClick={handleLocationClick}
-                        style={{ display: 'flex', alignItems: 'center', gap: '6px', cursor: 'pointer' }}
-                    >
-                        <MapPin size={16} color="white" />
-                        <span>Enviar a <strong>{location}</strong></span>
-                    </div>
-                </div>
-            </div>
-
             <div className="container header-container">
-                <div className="nav-top">
+                {/* Fila Superior: Logo, Búsqueda Central y Banner meli+ */}
+                <div className="nav-row-top">
                     <Link to="/" className="nav-logo">
-                        <img src="/logo.png" alt="Market" className="nav-logo-img" />
+                        <img src="/logo.svg" alt="SenaMarket" className="nav-logo-img" />
                     </Link>
 
                     <div className="nav-search-container" ref={suggestionsRef}>
@@ -120,8 +107,8 @@ const Navbar = () => {
                                 onChange={(e) => setSearchTerm(e.target.value)}
                                 onFocus={() => setShowSuggestions(true)}
                             />
-                            <button type="submit" className="nav-search-btn">
-                                <Search size={22} color="white" />
+                            <button type="submit" className="nav-search-btn" aria-label="Buscar">
+                                <Search size={20} color="#666" />
                             </button>
                         </form>
 
@@ -139,7 +126,68 @@ const Navbar = () => {
                         )}
                     </div>
 
-                    <div className="nav-account">
+                    <div className="nav-promo-banner">
+                        <div className="meli-plus-tag">
+                            <span className="meli-plus-brand">meli<strong>+</strong></span>
+                            <span className="meli-plus-price">DESDE <strong>$9.900</strong> /mes</span>
+                        </div>
+                        <div className="meli-plus-sub">
+                            <span>CASHBACK EN TUS COMPRAS</span>
+                        </div>
+                    </div>
+                </div>
+
+                {/* Fila Inferior: Ubicación, Menú Central de Categorías y Perfil/Carrito */}
+                <div className="nav-row-bottom">
+                    <div className="nav-location" onClick={handleLocationClick}>
+                        <MapPin size={18} className="nav-loc-icon" />
+                        <div className="nav-loc-text">
+                            <span className="nav-loc-label">Enviar a {user ? user.nombre_completo.split(' ')[0] : 'Ubicación'}</span>
+                            <span className="nav-loc-address">{location}</span>
+                        </div>
+                    </div>
+
+                    <ul className="nav-links">
+                        <li
+                            className="nav-item-dropdown"
+                            onMouseEnter={() => setShowCategories(true)}
+                            onMouseLeave={() => setShowCategories(false)}
+                            onClick={toggleCategories}
+                        >
+                            <span className="nav-link-dropdown">
+                                Categorías <span className="dropdown-arrow">▼</span>
+                            </span>
+                            <div className="dropdown-menu" style={{ display: showCategories ? 'block' : 'none' }}>
+                                <ul>
+                                    {categories.length > 0 ? (
+                                        categories.map(cat => (
+                                            <li key={cat.id}>
+                                                <Link to={`/items?category=${cat.id}`}>{cat.nombre}</Link>
+                                            </li>
+                                        ))
+                                    ) : (
+                                        <li style={{ padding: '10px', color: '#999', cursor: 'default' }}>Cargando categorías...</li>
+                                    )}
+                                </ul>
+                            </div>
+                        </li>
+                        <li><Link to="/items">Ofertas</Link></li>
+                        <li><Link to="/cupones">Cupones</Link></li>
+                        <li>
+                            <Link to="/items?category=6" className="nav-link-with-badge">
+                                Supermercado <span className="nav-badge-blue">NUEVO</span>
+                            </Link>
+                        </li>
+                        <li><Link to="/items?category=2">Moda</Link></li>
+                        {(user?.rol === 'VENDEDOR' || user?.rol === 'ADMINISTRADOR') ? (
+                            <li><Link to="/resumen">Vender</Link></li>
+                        ) : (
+                            <li><Link to="/vender">Vender</Link></li>
+                        )}
+                        <li><Link to="/ayuda">Ayuda / PQR</Link></li>
+                    </ul>
+
+                    <div className="nav-user-tools">
                         {user ? (
                             <div className="nav-profile-menu">
                                 <div className="nav-profile-trigger">
@@ -184,15 +232,6 @@ const Navbar = () => {
                                     <Link to="/resumen" className="menu-item-link">Resumen</Link>
                                     <Link to="/publicaciones" className="menu-item-link">Publicaciones</Link>
                                     <Link to="/ventas" className="menu-item-link">Ventas</Link>
-                                    <Link to="/posventa" className="menu-item-link">Posventa</Link>
-                                    <Link to="/reputacion" className="menu-item-link">Reputación</Link>
-                                    <Link to="/publicidad" className="menu-item-link">Publicidad</Link>
-                                    <Link to="/mi-pagina" className="menu-item-link">Mi página</Link>
-                                    <Link to="/central-marketing" className="menu-item-link" style={{ display: 'flex', justifyContent: 'space-between' }}>
-                                        Central de Marketing <span className="badge-blue">NUEVO</span>
-                                    </Link>
-                                    <Link to="/metricas" className="menu-item-link">Métricas</Link>
-                                    <Link to="/facturacion" className="menu-item-link">Facturación</Link>
 
                                     <hr />
 
@@ -202,76 +241,24 @@ const Navbar = () => {
                                 </div>
                             </div>
                         ) : (
-                            <>
+                            <div className="nav-auth-links">
                                 <Link to="/registro">Crea tu cuenta</Link>
                                 <Link to="/login">Ingresa</Link>
-                                <Link to="/mis-compras">Mis compras</Link>
-                            </>
+                            </div>
                         )}
-                        <Link to="/cart" className="nav-cart" style={{ display: 'flex', alignItems: 'center', position: 'relative' }}>
-                            <ShoppingCart size={24} color="#333" />
+
+                        <Link to="/mis-compras" className="nav-tool-link">Mis compras</Link>
+                        <span className="nav-tool-link nav-favorites-trigger">Favoritos ▼</span>
+
+                        <Link to="/cart" className="nav-cart-btn" aria-label="Carrito de compras">
+                            <ShoppingCart size={20} color="#333" />
                             {totalItems > 0 && (
-                                <span
-                                    className="cart-badge-pulse"
-                                    style={{
-                                        position: 'absolute',
-                                        top: '-8px',
-                                        right: '-10px',
-                                        backgroundColor: '#ff5722',
-                                        color: '#fff',
-                                        borderRadius: '50%',
-                                        padding: '2px 6px',
-                                        fontSize: '11px',
-                                        fontWeight: 'bold',
-                                        minWidth: '18px',
-                                        textAlign: 'center',
-                                        boxShadow: '0 2px 5px rgba(0,0,0,0.2)'
-                                    }}
-                                >
+                                <span className="cart-badge-count">
                                     {totalItems > 99 ? '99+' : totalItems}
                                 </span>
                             )}
                         </Link>
                     </div>
-                </div>
-
-                <div className="nav-bottom" style={{ marginTop: '10px' }}>
-                    <ul className="nav-links">
-
-                        <li
-                            className="nav-item-dropdown"
-                            onMouseEnter={() => setShowCategories(true)}
-                            onMouseLeave={() => setShowCategories(false)}
-                            onClick={toggleCategories}
-                        >
-                            <span className="nav-link-dropdown" style={{ fontWeight: 'bold', cursor: 'pointer', display: 'flex', alignItems: 'center' }}>
-                                <Menu size={18} style={{ marginRight: '4px' }} /> Categorías <span className="dropdown-arrow">▼</span>
-                            </span>
-                            <div className="dropdown-menu" style={{ display: showCategories ? 'block' : 'none' }}>
-                                <ul>
-                                    {categories.length > 0 ? (
-                                        categories.map(cat => (
-                                            <li key={cat.id}>
-                                                <Link to={`/items?category=${cat.id}`}>{cat.nombre}</Link>
-                                            </li>
-                                        ))
-                                    ) : (
-                                        <li style={{ padding: '10px', color: '#999', cursor: 'default' }}>Cargando categorías...</li>
-                                    )}
-                                </ul>
-                            </div>
-                        </li>
-                        <li><Link to="/ofertas" style={{ fontWeight: 'bold' }}>Ofertas</Link></li>
-                        <li><Link to="/historial" style={{ fontWeight: 'bold' }}>Historial</Link></li>
-                        <li><Link to="/items?category=2" style={{ fontWeight: 'bold' }}>Supermercado</Link></li>
-                        <li><Link to="/items?category=15" style={{ fontWeight: 'bold' }}>Moda</Link></li>
-                        {(user?.rol === 'VENDEDOR' || user?.rol === 'ADMINISTRADOR') ? (
-                            <li><Link to="/resumen" style={{ fontWeight: 'bold', color: '#3483fa' }}>Ventas</Link></li>
-                        ) : (
-                            <li><Link to="/vender" style={{ fontWeight: 'bold' }}>Vender</Link></li>
-                        )}
-                        <li><Link to="/ayuda" style={{ fontWeight: 'bold' }}>Ayuda</Link></li>
-                    </ul>
                 </div>
             </div>
         </header>

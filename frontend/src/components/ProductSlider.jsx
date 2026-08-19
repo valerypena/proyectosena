@@ -1,5 +1,6 @@
 import React, { useRef } from 'react';
 import { Link } from 'react-router-dom';
+import { ImageWithFallback } from './ImageWithFallback';
 import { formatPrice } from '../utils/currency';
 import { ChevronLeft, ChevronRight } from 'lucide-react';
 import './ProductSlider.css';
@@ -21,7 +22,7 @@ const ProductSlider = ({ title, products }) => {
     if (!products || products.length === 0) return null;
 
     return (
-        <section className="container product-slider-section">
+        <section className="product-slider-section">
             <div className="slider-header">
                 <h2 className="section-title">{title}</h2>
                 <div className="slider-nav">
@@ -40,7 +41,7 @@ const ProductSlider = ({ title, products }) => {
                     return (
                         <Link to={`/items/${prod.id}`} key={prod.id} className="card product-card slider-card">
                             <div className="product-img-container">
-                                <img src={prod.url_imagen || "https://via.placeholder.com/224"} alt={prod.nombre} />
+                                <ImageWithFallback src={prod.url_imagen} alt={prod.nombre} />
                             </div>
                             <div className="product-info">
                                 {hasPromo && (

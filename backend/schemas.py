@@ -113,6 +113,7 @@ class CategoriaBase(BaseModel):
 
 class CategoriaOut(CategoriaBase):
     id: int
+    cantidad_productos: Optional[int] = 0
 
     class Config:
         from_attributes = True

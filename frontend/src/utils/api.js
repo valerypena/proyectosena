@@ -6,9 +6,12 @@ import { API_URL } from '../config';
 export async function apiFetch(endpoint, options = {}) {
     const token = localStorage.getItem('token');
     const headers = {
-        'Content-Type': 'application/json',
         ...(options.headers || {}),
     };
+
+    if (options.body && !headers['Content-Type']) {
+        headers['Content-Type'] = 'application/json';
+    }
 
     if (token) {
         headers['Authorization'] = `Bearer ${token}`;

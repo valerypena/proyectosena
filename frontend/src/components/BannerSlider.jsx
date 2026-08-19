@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { Link } from 'react-router-dom';
+import { apiFetch } from '../utils/api';
 import './BannerSlider.css';
 
 const BannerSlider = () => {
@@ -18,10 +19,9 @@ const BannerSlider = () => {
 
     useEffect(() => {
         // Fetch categories to generate dynamic offer banners
-        fetch('http://127.0.0.1:8000/categorias')
-            .then(res => res.json())
+        apiFetch('/categorias')
             .then(data => {
-                if (data.length > 0) {
+                if (data && data.length > 0) {
                     // Start with a generic "Main Offer" slide
                     const newSlides = [
                         {

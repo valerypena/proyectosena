@@ -1,101 +1,65 @@
 import React, { useEffect, useState } from 'react';
-import { Link } from 'react-router-dom';
+import { useSearchParams } from 'react-router-dom';
 import BannerSlider from '../components/BannerSlider';
-import ProductSlider from '../components/ProductSlider';
+import { OfferTabs } from '../components/OfferTabs';
+import { SidebarFilters } from '../components/SidebarFilters';
+import { ProductCard } from '../components/ProductCard';
 import { ProductSkeleton } from '../components/SkeletonLoader';
-import { ImageWithFallback } from '../components/ImageWithFallback';
-import { formatPrice } from '../utils/currency';
 import { apiFetch } from '../utils/api';
 import './Home.css';
 
 const Home = () => {
+    const [searchParams] = useSearchParams();
     const [allProducts, setAllProducts] = useState([]);
-    const [offers, setOffers] = useState([]);
-    const [featured, setFeatured] = useState([]);
     const [loading, setLoading] = useState(true);
+
+    const categoryId = searchParams.get('category');
+    const min = searchParams.get('min');
+    const max = searchParams.get('max');
+    const promo = searchParams.get('promo');
+    const shipping = searchParams.get('shipping');
 
     useEffect(() => {
         setLoading(true);
-        apiFetch('/productos?limit=100')
+        let endpoint = '/productos?limit=60';
+        if (categoryId) endpoint += `&categoria_id=${categoryId}`;
+        if (min) endpoint += `&precio_min=${min}`;
+        if (max) endpoint += `&precio_max=${max}`;
+
+        apiFetch(endpoint)
             .then(data => {
-                const prods = data || [];
-                setAllProducts(prods);
-
-                // Simular lógica de productos al azar para sliders
-                const shuffled = [...prods].sort(() => 0.5 - Math.random());
-                setOffers(shuffled.slice(0, 15));
-
-                const shuffled2 = [...prods].sort(() => 0.5 - Math.random());
-                setFeatured(shuffled2.slice(0, 15));
+                setAllProducts(data || []);
             })
             .catch(err => console.error("Error fetching products:", err))
             .finally(() => setLoading(false));
-    }, []);
+    }, [categoryId, min, max, promo, shipping]);
 
     return (
         <main className="home-container">
-            <BannerSlider />
+            {/* Barra de Pestañas de Ofertas con Iconos */}
+            <OfferTabs />
 
-            <section className="container">
-                <div className="payment-methods-bar card">
-                    <div className="pm-item">
-                        <span className="pm-icon">💳</span>
-                        <div className="pm-text">
-                            <strong>Tarjetas bancarias</strong>
-                            <span>Ver promociones</span>
-                        </div>
-                    </div>
-                    <div className="pm-item">
-                        <span className="pm-icon">⚡</span>
-                        <div className="pm-text">
-                            <strong>Cuotas sin interés</strong>
-                            <span>Con bancos aliados</span>
-                        </div>
-                    </div>
-                    <div className="pm-item">
-                        <span className="pm-icon">💸</span>
-                        <div className="pm-text">
-                            <strong>Efectivo</strong>
-                            <span>Paga en puntos aliados</span>
-                        </div>
-                    </div>
-                    <div className="pm-item">
-                        <span className="pm-icon">➕</span>
-                        <div className="pm-text">
-                            <strong>Más medios</strong>
-                            <span>Ver todos</span>
-                        </div>
+            {/* Layout Principal: Menú Lateral a la Izquierda desde Arriba + Catálogo a la Derecha */}
+            <section className="container home-catalog-section">
+                <div className="home-catalog-layout">
+                    <SidebarFilters totalCount={allProducts.length} title="Ofertas" />
+
+                    <div className="home-catalog-content">
+                        {loading ? (
+                            <ProductSkeleton count={9} />
+                        ) : allProducts.length === 0 ? (
+                            <div className="card" style={{ padding: '60px 20px', textAlign: 'center', color: '#64748b' }}>
+                                No se encontraron productos para los filtros seleccionados.
+                            </div>
+                        ) : (
+                            <div className="results-grid-ml">
+                                {allProducts.map(prod => (
+                                    <ProductCard key={prod.id} product={prod} />
+                                ))}
+                            </div>
+                        )}
                     </div>
                 </div>
-            </section>
-
-            {/* Slider de Ofertas */}
-            <ProductSlider title="Ofertas Relámpago" products={offers} />
-
-            {/* Slider de Recomendados */}
-            <ProductSlider title="Inspirado en lo último que viste" products={featured} />
-
-            {/* Grid Principal (El resto de productos) */}
-            <section className="container products-section">
-                <h2 className="section-title">Descubre más productos</h2>
-                {loading ? (
-                    <ProductSkeleton count={8} />
-                ) : (
-                    <div className="products-grid">
-                        {allProducts.slice(0, 20).map(prod => (
-                            <Link to={`/items/${prod.id}`} key={prod.id} className="card product-card">
-                                <div className="product-img-container">
-                                    <ImageWithFallback src={prod.url_imagen} alt={prod.nombre} />
-                                </div>
-                                <div className="product-info">
-                                    <h3 className="product-price">{formatPrice(prod.precio)}</h3>
-                                    <span className="shipping-free">Envío gratis</span>
-                                    <p className="product-title">{prod.nombre}</p>
-                                </div>
-                            </Link>
-                        ))}
-                    </div>
-                )}
             </section>
         </main>
     );

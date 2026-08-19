@@ -4,6 +4,9 @@
     font-family: inherit;
     color: #333333;
     padding-right: 15px;
+    position: sticky;
+    top: 15px;
+    align-self: flex-start;
 }
 
 /* Header */

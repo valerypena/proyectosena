@@ -7,10 +7,22 @@ from database import get_db
 
 router = APIRouter(tags=["Catálogo Público"])
 
+from sqlalchemy import func
+
 # LISTAR CATEGORIAS
 @router.get("/categorias", response_model=List[schemas.CategoriaOut])
 def listar_categorias(db: Session = Depends(get_db)):
-    return db.query(models.Categoria).all()
+    categorias = db.query(models.Categoria).all()
+    resultado = []
+    for cat in categorias:
+        total = db.query(func.count(models.Producto.id)).filter(models.Producto.categoria_id == cat.id).scalar()
+        resultado.append({
+            "id": cat.id,
+            "nombre": cat.nombre,
+            "descripcion": cat.descripcion,
+            "cantidad_productos": total or 0
+        })
+    return resultado
 
 # LISTAR EMPRENDIMIENTOS
 @router.get("/emprendimientos", response_model=List[schemas.EmprendimientoOut])
