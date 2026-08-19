@@ -1,18 +1,18 @@
-/* Navbar Principal - Amarillo Oficial */
+/* Navbar Principal - Verde Institucional SENA */
 .nav-header {
-    background-color: #ffe600;
-    border-bottom: 1px solid #e6e6e6;
-    padding: 8px 0 10px 0;
+    background: linear-gradient(90deg, #2b8200 0%, #39a900 100%);
+    border-bottom: 2px solid #236c00;
+    padding: 10px 0 12px 0;
     position: sticky;
     top: 0;
     z-index: 100;
-    box-shadow: 0 1px 1px 0 rgba(0, 0, 0, 0.1);
+    box-shadow: 0 2px 8px 0 rgba(0, 50, 77, 0.15);
 }
 
 .header-container {
     display: flex;
     flex-direction: column;
-    gap: 8px;
+    gap: 10px;
     max-width: 1240px;
     margin: 0 auto;
     padding: 0 15px;
@@ -23,7 +23,7 @@
     display: flex;
     align-items: center;
     justify-content: space-between;
-    gap: 20px;
+    gap: 24px;
 }
 
 .nav-logo {
@@ -56,19 +56,19 @@
 .nav-search {
     display: flex;
     background: #ffffff;
-    border-radius: 4px;
-    height: 40px;
-    box-shadow: 0 1px 2px 0 rgba(0, 0, 0, 0.2);
+    border-radius: 6px;
+    height: 42px;
+    box-shadow: 0 2px 6px rgba(0, 0, 0, 0.12);
     overflow: hidden;
 }
 
 .nav-search-input {
     flex: 1;
     border: none;
-    padding: 0 16px;
+    padding: 0 18px;
     font-size: 14px;
     outline: none;
-    color: #333333;
+    color: #1e293b;
 }
 
 .nav-search-input::placeholder {
@@ -78,29 +78,34 @@
 .nav-search-btn {
     background: none;
     border: none;
-    border-left: 1px solid #e2e8f0;
-    padding: 0 14px;
+    border-left: 1px solid #f1f5f9;
+    padding: 0 16px;
     cursor: pointer;
     display: flex;
     align-items: center;
     justify-content: center;
-    color: #64748b;
-    transition: background 0.2s ease;
+    color: #39a900;
+    transition: background 0.2s ease, color 0.2s ease;
 }
 
 .nav-search-btn:hover {
     background: #f8fafc;
+    color: #2b8200;
 }
 
-/* Banner meli+ a la derecha */
+/* Banner Informativo a la derecha */
 .nav-promo-banner {
     display: flex;
     flex-direction: column;
     align-items: flex-end;
     font-size: 11px;
-    color: #333333;
-    line-height: 1.2;
+    color: #ffffff;
+    line-height: 1.25;
     flex-shrink: 0;
+    background: rgba(0, 0, 0, 0.12);
+    padding: 6px 12px;
+    border-radius: 6px;
+    border: 1px solid rgba(255, 255, 255, 0.2);
 }
 
 .meli-plus-tag {
@@ -111,20 +116,20 @@
 
 .meli-plus-brand {
     font-weight: 900;
-    background: linear-gradient(90deg, #a855f7, #ec4899);
-    -webkit-background-clip: text;
-    -webkit-text-fill-color: transparent;
+    color: #ffe600;
     font-size: 13px;
+    letter-spacing: 0.3px;
 }
 
 .meli-plus-price strong {
     font-weight: 800;
+    color: #ffffff;
 }
 
 .meli-plus-sub {
     font-weight: 700;
-    letter-spacing: 0.2px;
-    color: #1e293b;
+    letter-spacing: 0.3px;
+    color: #f0fdf4;
     font-size: 10px;
 }
 
@@ -134,7 +139,7 @@
     align-items: center;
     justify-content: space-between;
     font-size: 13px;
-    color: #333333;
+    color: #ffffff;
     gap: 15px;
 }
 
@@ -144,35 +149,35 @@
     align-items: center;
     gap: 6px;
     cursor: pointer;
-    padding: 4px 6px;
+    padding: 4px 8px;
     border-radius: 4px;
     transition: background 0.2s ease;
     flex-shrink: 0;
 }
 
 .nav-location:hover {
-    background: rgba(0, 0, 0, 0.05);
+    background: rgba(255, 255, 255, 0.15);
 }
 
 .nav-loc-icon {
-    color: #333333;
+    color: #ffffff;
 }
 
 .nav-loc-text {
     display: flex;
     flex-direction: column;
-    line-height: 1.1;
+    line-height: 1.15;
 }
 
 .nav-loc-label {
     font-size: 11px;
-    color: #666666;
+    color: #e2e8f0;
 }
 
 .nav-loc-address {
     font-size: 12px;
     font-weight: 600;
-    color: #333333;
+    color: #ffffff;
 }
 
 /* Enlaces de Navegación */
@@ -189,10 +194,10 @@
 .nav-links li a,
 .nav-link-dropdown {
     text-decoration: none;
-    color: rgba(51, 51, 51, 0.9);
+    color: #f8fafc;
     font-size: 13px;
-    font-weight: 400;
-    transition: color 0.15s ease;
+    font-weight: 500;
+    transition: color 0.15s ease, opacity 0.15s ease;
     display: flex;
     align-items: center;
     gap: 3px;
@@ -201,12 +206,12 @@
 
 .nav-links li a:hover,
 .nav-link-dropdown:hover {
-    color: #000000;
+    color: #ffe600;
 }
 
 .dropdown-arrow {
     font-size: 9px;
-    color: #666666;
+    color: #e2e8f0;
 }
 
 .nav-link-with-badge {
@@ -217,14 +222,15 @@
 }
 
 .nav-badge-blue {
-    background-color: #3483fa;
+    background-color: #00324d;
     color: #ffffff;
     font-size: 9px;
     font-weight: 700;
-    padding: 1px 4px;
+    padding: 1px 5px;
     border-radius: 3px;
     line-height: 1.2;
     text-transform: uppercase;
+    border: 1px solid rgba(255, 255, 255, 0.3);
 }
 
 /* Herramientas de Usuario y Carrito */
@@ -244,16 +250,16 @@
 .nav-auth-links a,
 .nav-tool-link {
     text-decoration: none;
-    color: #333333;
+    color: #f8fafc;
     font-size: 13px;
-    font-weight: 400;
+    font-weight: 500;
     transition: color 0.15s ease;
     cursor: pointer;
 }
 
 .nav-auth-links a:hover,
 .nav-tool-link:hover {
-    color: #000000;
+    color: #ffe600;
 }
 
 .nav-favorites-trigger {
@@ -265,7 +271,14 @@
     display: flex;
     align-items: center;
     text-decoration: none;
-    padding: 4px;
+    padding: 6px;
+    border-radius: 50%;
+    background: rgba(255, 255, 255, 0.15);
+    transition: background 0.2s ease;
+}
+
+.nav-cart-btn:hover {
+    background: rgba(255, 255, 255, 0.25);
 }
 
 .cart-badge-count {
@@ -277,10 +290,11 @@
     border-radius: 50%;
     padding: 1px 5px;
     font-size: 10px;
-    font-weight: 700;
+    font-weight: 800;
     min-width: 16px;
     text-align: center;
     line-height: 1.2;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
 }
 
 /* Dropdown Categorías */
@@ -292,14 +306,15 @@
     position: absolute;
     top: 100%;
     left: 0;
-    background: #333333;
+    background: #00324d;
     color: #ffffff;
-    border-radius: 4px;
-    box-shadow: 0 8px 16px rgba(0, 0, 0, 0.2);
-    min-width: 220px;
+    border-radius: 6px;
+    box-shadow: 0 10px 25px rgba(0, 0, 0, 0.25);
+    min-width: 230px;
     z-index: 1000;
     padding: 10px 0;
     margin-top: 8px;
+    border: 1px solid rgba(255, 255, 255, 0.1);
 }
 
 .dropdown-menu ul {
@@ -309,15 +324,16 @@
 }
 
 .dropdown-menu li a {
-    color: #ffffff !important;
-    padding: 8px 20px;
+    color: #f1f5f9 !important;
+    padding: 9px 20px;
     display: block;
     font-size: 13px;
-    transition: background 0.2s ease;
+    transition: background 0.2s ease, color 0.2s ease;
 }
 
 .dropdown-menu li a:hover {
-    background: #3483fa;
+    background: #39a900;
+    color: #ffffff !important;
 }
 
 /* User Profile Dropdown */
@@ -331,20 +347,21 @@
     gap: 6px;
     cursor: pointer;
     font-size: 13px;
-    font-weight: 500;
+    font-weight: 600;
+    color: #ffffff;
 }
 
 .avatar-circle-sm {
-    width: 24px;
-    height: 24px;
+    width: 26px;
+    height: 26px;
     border-radius: 50%;
-    background: #e2e8f0;
-    color: #333333;
+    background: #ffffff;
+    color: #00324d;
     display: flex;
     align-items: center;
     justify-content: center;
-    font-weight: 700;
-    font-size: 11px;
+    font-weight: 800;
+    font-size: 12px;
 }
 
 .profile-dropdown-content {
@@ -353,12 +370,13 @@
     right: 0;
     top: 100%;
     background: #ffffff;
-    min-width: 220px;
-    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
-    border-radius: 6px;
+    min-width: 230px;
+    box-shadow: 0 10px 25px rgba(0, 0, 0, 0.18);
+    border-radius: 8px;
     padding: 12px 0;
     z-index: 1000;
     margin-top: 8px;
+    border: 1px solid #e2e8f0;
 }
 
 .nav-profile-menu:hover .profile-dropdown-content {
@@ -374,10 +392,10 @@
 }
 
 .avatar-large-menu {
-    width: 36px;
-    height: 36px;
+    width: 38px;
+    height: 38px;
     border-radius: 50%;
-    background: #3483fa;
+    background: #39a900;
     color: #ffffff;
     display: flex;
     align-items: center;
@@ -393,26 +411,26 @@
 .header-name {
     font-weight: 600;
     font-size: 14px;
-    color: #1e293b;
+    color: #00324d;
 }
 
 .header-link {
     font-size: 12px;
-    color: #3483fa;
+    color: #39a900;
     text-decoration: none;
 }
 
 .menu-item-link {
     display: block;
     padding: 8px 16px;
-    color: #333333;
+    color: #334155;
     text-decoration: none;
     font-size: 13px;
 }
 
 .menu-item-link:hover {
-    background: #f8fafc;
-    color: #3483fa;
+    background: #f0fdf4;
+    color: #39a900;
 }
 
 .menu-item-logout {
@@ -426,12 +444,13 @@
     left: 0;
     right: 0;
     background: #ffffff;
-    border-radius: 0 0 4px 4px;
-    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+    border-radius: 0 0 6px 6px;
+    box-shadow: 0 8px 20px rgba(0, 0, 0, 0.15);
     z-index: 1000;
     margin-top: 2px;
     max-height: 280px;
     overflow-y: auto;
+    border: 1px solid #e2e8f0;
 }
 
 .search-suggestions-dropdown ul {
@@ -447,11 +466,12 @@
     gap: 12px;
     cursor: pointer;
     font-size: 14px;
-    color: #333333;
+    color: #1e293b;
 }
 
 .search-suggestions-dropdown li:hover {
-    background: #f1f5f9;
+    background: #f0fdf4;
+    color: #39a900;
 }
 
 @media (max-width: 900px) {

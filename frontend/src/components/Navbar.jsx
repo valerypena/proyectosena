@@ -251,7 +251,7 @@ const Navbar = () => {
                         <span className="nav-tool-link nav-favorites-trigger">Favoritos ▼</span>
 
                         <Link to="/cart" className="nav-cart-btn" aria-label="Carrito de compras">
-                            <ShoppingCart size={20} color="#333" />
+                            <ShoppingCart size={20} color="#ffffff" />
                             {totalItems > 0 && (
                                 <span className="cart-badge-count">
                                     {totalItems > 99 ? '99+' : totalItems}

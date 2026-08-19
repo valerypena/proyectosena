@@ -51,22 +51,10 @@ from sqlalchemy.exc import SQLAlchemyError
 # Configuración de CORS amplia y compatible para desarrollo y producción
 app.add_middleware(
     CORSMiddleware,
-    allow_origins=[
-        "http://localhost:5173",
-        "http://127.0.0.1:5173",
-        "http://localhost:3000",
-        "http://127.0.0.1:3000",
-        "http://localhost:5174",
-        "http://127.0.0.1:5174",
-        "http://localhost:5175",
-        "http://127.0.0.1:5175",
-        "http://localhost:5176",
-        "http://127.0.0.1:5176",
-        "http://localhost:8000",
-        "http://127.0.0.1:8000",
-    ],
+    allow_origins=settings.ALLOWED_ORIGINS,
+    allow_origin_regex=r"https?://.*(localhost|127\.0\.0\.1|onrender\.com)(:\d+)?",
     allow_credentials=True,
-    allow_methods=["GET", "POST", "PUT", "DELETE", "OPTIONS", "PATCH", "HEAD"],
+    allow_methods=["*"],
     allow_headers=["*"],
     expose_headers=["*"],
 )
@@ -89,12 +77,15 @@ app.include_router(reviews.router) # /resenas/...
 app.include_router(user_details.router) # /perfil/direcciones, /perfil/tarjetas
 app.include_router(questions.router) # /preguntas/...
 
-# Servir archivos estáticos del Frontend
+# Servir archivos estáticos del Frontend si existen
 frontend_path = os.path.join(os.path.dirname(__file__), "..", "frontend", "dist")
 if os.path.exists(frontend_path):
     app.mount("/", StaticFiles(directory=frontend_path, html=True), name="frontend")
 
 if __name__ == "__main__":
     import uvicorn
-    uvicorn.run("main:app", host="127.0.0.1", port=8000, reload=True)
+    port = int(os.environ.get("PORT", 8000))
+    host = "0.0.0.0"
+    reload = os.environ.get("ENV", "production").lower() != "production"
+    uvicorn.run("main:app", host=host, port=port, reload=reload)
 

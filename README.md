@@ -1,15 +1,15 @@
-# 🛒 UNIMARKET - Plataforma E-Commerce para Emprendimientos SENA / Universitarios
+# 🛒 SENAMARKET - Plataforma E-Commerce para Emprendimientos SENA
 
 [![FastAPI](https://img.shields.io/badge/Backend-FastAPI-009688?style=flat-square&logo=fastapi)](https://fastapi.tiangolo.com/)
-[![React](https://img.shields.io/badge/Frontend-React%20%2B%20Vite-61DAFB?style=flat-square&logo=react)](https://reactjs.org/)
+[![React](https://img.shields.io/badge/Frontend-React%2018%20%2B%20Vite-61DAFB?style=flat-square&logo=react)](https://reactjs.org/)
+[![MySQL](https://img.shields.io/badge/Database-MySQL%208.0-4479A1?style=flat-square&logo=mysql)](https://www.mysql.com/)
+[![Redis](https://img.shields.io/badge/Cache-Redis%207.0-DC382D?style=flat-square&logo=redis)](https://redis.io/)
 [![NodeJS](https://img.shields.io/badge/Microservices-Node.js%20%2B%20TS-339933?style=flat-square&logo=node.js)](https://nodejs.org/)
-[![MySQL](https://img.shields.io/badge/Database-MySQL-4479A1?style=flat-square&logo=mysql)](https://www.mysql.com/)
-[![Redis](https://img.shields.io/badge/Cache-Redis-DC382D?style=flat-square&logo=redis)](https://redis.io/)
 [![RabbitMQ](https://img.shields.io/badge/Broker-RabbitMQ-FF6600?style=flat-square&logo=rabbitmq)](https://www.rabbitmq.com/)
 
-**UNIMARKET** es un ecosistema tecnológico integral de comercio electrónico diseñado para impulsar, visibilizar y comercializar productos y servicios creados por emprendedores de la comunidad universitaria y aprendices SENA. 
+**SenaMarket** es un ecosistema tecnológico integral de comercio electrónico diseñado para impulsar, visibilizar y comercializar productos y servicios creados por emprendedores y aprendices del SENA.
 
-Combina un **Monolito robusto en Python (FastAPI)** con una **Arquitectura distribuida de Microservicios (Node.js/TypeScript)**, proporcionando alta disponibilidad, escalabilidad horizontal, procesamiento asincrónico de eventos y una experiencia de usuario moderna y fluida.
+Ofrece una experiencia de usuario de alto nivel inspirada en los estándares de los principales marketplaces de la industria, combinando un **Backend monolítico modular y transaccional en Python (FastAPI)** con una **Arquitectura distribuida de Microservicios (Node.js/TypeScript)** y un **Frontend reactivo de alta velocidad (React 18 + Vite)**.
 
 ---
 
@@ -17,50 +17,48 @@ Combina un **Monolito robusto en Python (FastAPI)** con una **Arquitectura distr
 
 Para consultar el diseño de software detallado y los patrones de arquitectura, revisa los documentos en la carpeta `docs/`:
 
-👉 **[Documentación Completa con Diagramas UML (docs/UML_DIAGRAMS.md)](docs/UML_DIAGRAMS.md)**  
-👉 **[Esquema DDL de Base de Datos MySQL (docs/schema.sql)](docs/schema.sql)**
+- 👉 **[Documentación Completa con Diagramas UML (docs/UML_DIAGRAMS.md)](docs/UML_DIAGRAMS.md)**
+- 👉 **[Esquema DDL de Base de Datos MySQL (docs/schema.sql)](docs/schema.sql)**
 
-### Diagramas UML Incluidos (Mermaid Format):
-1. **Diagrama de Casos de Uso** (*Use Case Diagram*)
-2. **Diagrama de Clases del Dominio** (*Class Diagram*)
-3. **Diagrama Entidad-Relación** (*ER Diagram / Modelo MySQL*)
-4. **Diagrama de Secuencia: Checkout y Procesamiento de Orden** (*Sequence Diagram*)
-5. **Diagrama de Secuencia: Autenticación JWT y Redis Session Store** (*Sequence Diagram*)
-6. **Diagrama de Componentes del Sistema** (*Component Diagram*)
-7. **Diagrama de Despliegue e Infraestructura** (*Deployment Diagram*)
-8. **Diagrama de Máquina de Estados: Ciclo de Vida de una Compra** (*State Machine Diagram*)
-9. **Diagrama de Actividades: Gestión de Productos por Vendedor** (*Activity Diagram*)
+### Diagramas UML Incluidos (Sintaxis Mermaid):
+1. **Diagrama de Casos de Uso**: Actores (*Comprador, Vendedor, Administrador, Notificador*) y flujos principales.
+2. **Diagrama de Clases del Dominio**: Entidades `Usuario`, `Emprendimiento`, `Producto`, `Categoria`, `Orden`, `ItemOrden`, `Resena`, `Pregunta`.
+3. **Diagrama Entidad-Relación (ER)**: Modelo relacional completo en MySQL.
+4. **Diagrama de Secuencia - Checkout Transaccional**: Validación de stock, débito atómico, creación de orden e invalidación de caché.
+5. **Diagrama de Secuencia - Autenticación JWT y Roles**: Flujo seguro con bcrypt y listas de acceso.
+6. **Diagrama de Componentes**: Desacoplamiento entre UI, API Gateway, Backend FastAPI, Redis y MySQL.
+7. **Diagrama de Despliegue de Infraestructura**: Topología de servidores, proxy, servicios y almacenamiento.
+8. **Diagrama de Máquina de Estados**: Ciclo de vida de una compra (*PENDIENTE ➔ PAGADO ➔ ENVIADO ➔ ENTREGADO / CANCELADO*).
+9. **Diagrama de Actividades**: Flujo de publicación y administración de catálogo por el vendedor.
 
 ---
 
 ## 🛠️ Stack Tecnológico
 
-### **Frontend**
+### **Frontend (Cliente Web)**
 - **Framework**: React 18 + Vite
-- **Lenguaje**: JavaScript / TypeScript
-- **Estilos**: Tailwind CSS, CSS Modules
-- **Iconografía**: Lucide React
-- **Peticiones HTTP**: Axios / Fetch API
+- **Lenguaje**: JavaScript moderno (ES6+) / JSX
+- **Navegación**: React Router DOM v6
+- **Componentes Clave**:
+  - `Navbar`: Cabecera oficial de doble fila con paleta `#FFE600`, selector de ubicación, banner `meli+` y menú contextual.
+  - `OfferTabs`: Pestañas horizontales de ofertas con iconos (*Todas las ofertas, Ofertas relámpago, Precios Imbatibles, Celulares, Notebooks, Liquidación*).
+  - `SidebarFilters`: Menú lateral interactivo con categorías reales desde BD, switch `FULL`, tiempos de entrega y selector de precios.
+  - `ProductCard`: Tarjetas de producto en cuadrícula de 3 columnas con badges (*MÁS VENDIDO / OFERTA DEL DÍA*), rating con estrellas, cuotas con 0% interés, cupones y entrega garantizada.
+  - `ToastContext` & `CartContext`: Estado global reactivo para notificaciones flotantes y carrito sincronizado.
+  - `SkeletonLoader` & `ImageWithFallback`: Carga progresiva y tolerancia a fallos en imágenes externas.
 
-### **Backend Core (Monolito FastAPI)**
+### **Backend Core (FastAPI)**
 - **Framework**: Python 3.11+ / 3.12 + FastAPI
-- **Servidor ASGI**: Uvicorn (Arranque integrado vía `python main.py`)
-- **ORM / BD**: SQLAlchemy + PyMySQL
-- **Validación**: Pydantic v2
-- **Seguridad**: JWT (JSON Web Tokens) + Passlib (bcrypt)
-- **Generación de Reportes**: ReportLab (PDFs automatizados)
+- **Servidor ASGI**: Uvicorn
+- **ORM / BD**: SQLAlchemy 2.0 + PyMySQL
+- **Validación y DTOs**: Pydantic v2
+- **Seguridad**: JWT (HS256) + Passlib (bcrypt) + Control estricto de roles (*COMPRADOR, VENDEDOR, ADMINISTRADOR*)
+- **Caché y Rendimiento**: Redis 7.0 con patrón fallback transparente e invalidación por patrones (`delete_pattern`)
+- **Transaccionalidad**: Manejo atómico con `try...except` y `db.rollback()` en operaciones de compra.
 
-### **Microservicios (Node.js / TypeScript)**
+### **Microservicios Complementarios (Node.js / TypeScript)**
 - **Runtime**: Node.js v18+
-- **API Gateway**: Express HTTP Proxy / Gateway Pattern
-- **Librería Compartida**: `@unimarket/shared` (Drivens, Types & Utils)
-- **Patrones de Resiliencia**: Opossum (Circuit Breaker Pattern)
-
-### **Infraestructura y Persistencia**
-- **Base de Datos Relacional**: MySQL 8.0 / MariaDB (Catálogo, Usuarios, Compras, Reseñas)
-- **Base de Datos NoSQL**: MongoDB 6.0 (Servicios analíticos / registros)
-- **Caché In-Memory**: Redis 7.0 (Manejador de sesiones, listas blancas/negras JWT y Rate Limiting)
-- **Broker de Mensajería**: RabbitMQ (Event-Driven Architecture)
+- **Patrones**: API Gateway, Circuit Breaker (Opossum), Event-Driven Architecture (RabbitMQ).
 
 ---
 
@@ -69,122 +67,100 @@ Para consultar el diseño de software detallado y los patrones de arquitectura, 
 ```text
 proyectosena/
  ├── backend/                   # Core API en Python FastAPI
- │    ├── routers/              # Endpoints (users, vendors, orders, products, etc.)
- │    ├── models.py             # Modelos SQLAlchemy
- │    ├── schemas.py            # Esquemas Pydantic
- │    ├── database.py           # Conexión MySQL
- │    ├── redis_client.py       # Conexión y cliente Redis (Con fallback tolerante)
- │    ├── auth.py               # Generación y validación JWT
- │    ├── setup_full_db.py      # Script de inicialización y siembra masiva de BD
- │    ├── generate_*_pdf.py     # Módulos de generación de documentación PDF
- │    └── main.py               # Punto de entrada y servidor FastAPI / Uvicorn
+ │    ├── config.py             # Configuración centralizada y orígenes CORS
+ │    ├── database.py           # Conexión y sesión de base de datos MySQL
+ │    ├── models.py             # Modelos relacionales SQLAlchemy
+ │    ├── schemas.py            # Esquemas Pydantic para validación y serialización
+ │    ├── auth.py               # Funciones de autenticación, hash y tokens JWT
+ │    ├── redis_client.py       # Gestor de caché Redis con invalidación automática
+ │    ├── routers/              # Enrutadores modulares por dominio
+ │    │    ├── auth.py          # Registro, login y tokens
+ │    │    ├── users.py         # Gestión de usuarios, perfiles y seguridad
+ │    │    ├── public.py        # Catálogo público y categorías con conteos dinámicos
+ │    │    ├── vendor.py        # Panel de control de vendedores y productos
+ │    │    ├── orders.py        # Carrito, checkout atómico y pedidos
+ │    │    ├── questions.py     # Preguntas y respuestas sobre productos
+ │    │    ├── addresses.py     # Libreta de direcciones de envío
+ │    │    └── cards.py         # Tarjetas y métodos de pago guardados
+ │    └── main.py               # Servidor FastAPI, middleware CORS y routers
  │
  ├── frontend/                  # Aplicación Web React + Vite
- │    ├── src/                  # Componentes, vistas, hooks y estilos
+ │    ├── public/               # Recursos estáticos y logo.svg oficial de SenaMarket
+ │    ├── src/
+ │    │    ├── components/      # Navbar, OfferTabs, SidebarFilters, ProductCard, Toasts, Skeletons
+ │    │    ├── context/         # AuthContext, CartContext, ToastContext
+ │    │    ├── pages/           # Home, SearchResults, ProductDetail, Cart, Checkout, etc.
+ │    │    ├── utils/           # apiFetch unificado, formateador de moneda
+ │    │    ├── App.jsx          # Enrutador principal y proveedores globales
+ │    │    └── main.jsx         # Punto de entrada de React
  │    ├── package.json
  │    └── vite.config.js
  │
- ├── services/                  # Microservicios en Node.js / TypeScript
- │    ├── api-gateway/          # Puerta de entrada y proxy inverso
- │    ├── auth-service/         # Servicio dedicado de autenticación
- │    ├── cart-service/         # Servicio de gestión de carrito de compras
- │    ├── health-service/       # Servicio de monitoreo de salud del sistema
- │    ├── notification-service/ # Consumidor de eventos y envío de notificaciones
- │    ├── order-service/        # Servicio de gestión de órdenes de compra
- │    ├── product-service/      # Servicio de productos y catálogo
- │    ├── sync-service/         # Servicio de sincronización de datos
- │    └── user-service/         # Servicio de gestión de perfiles de usuario
- │
- ├── shared/                    # Paquete TypeScript compartido (@unimarket/shared)
  ├── docs/                      # Documentación del sistema
- │    ├── schema.sql            # Esquemas y tablas DDL para MySQL
- │    └── UML_DIAGRAMS.md       # Documentación de 9 diagramas UML (Mermaid)
- └── package.json               # Configuración Workspace/Shared Node.js
+ │    ├── UML_DIAGRAMS.md       # 9 Diagramas UML en sintaxis Mermaid
+ │    └── schema.sql            # Definición DDL de base de datos MySQL
+ └── services/                  # Microservicios complementarios (Node.js / TS)
 ```
 
 ---
 
-## 🚀 Guía de Instalación y Ejecución Rápida
+## 🚀 Guía de Instalación y Ejecución
 
-### **1. Requisitos Previos**
-- [Node.js](https://nodejs.org/) (v18 o superior) y `npm`
-- [Python](https://www.python.org/) (v3.10 o superior) y `pip`
-- [MySQL Server](https://www.mysql.com/) / XAMPP (v8.0 en puerto 3306)
-- [Redis Server](https://redis.io/) *(opcional; el sistema funciona con fallback en memoria si no está activo)*
+### Prerrequisitos
+- **Python 3.11+**
+- **Node.js 18+** y **npm**
+- **MySQL Server 8.0+**
+- **Redis Server** (Opcional, el backend opera con fallback tolerante)
 
 ---
 
-### **2. Configuración y Siembra de la Base de Datos**
-
-#### Opción A: Automática vía Script (Recomendado)
-Abre tu terminal en `backend/` e inicia la base de datos con datos de prueba (700 productos en 14 categorías, 20 vendedores, usuarios y reseñas):
+### 1. Configuración del Backend
 
 ```bash
 cd backend
-python setup_full_db.py
+
+# 1. Crear y activar entorno virtual
+python -m venv venv
+# Windows:
+venv\Scripts\activate
+# Linux/Mac:
+source venv/bin/activate
+
+# 2. Instalar dependencias
+pip install -r requirements.txt
+
+# 3. Iniciar el servidor FastAPI
+python main.py
 ```
+> La API estará disponible en `http://127.0.0.1:8000` con documentación interactiva Swagger en `http://127.0.0.1:8000/docs`.
 
-#### Opción B: Manual vía SQL
-Importa el esquema en MySQL / phpMyAdmin mediante el archivo [`docs/schema.sql`](docs/schema.sql):
+---
 
-```sql
-CREATE DATABASE unimarket CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;
-USE unimarket;
-SOURCE docs/schema.sql;
+### 2. Configuración del Frontend
+
+```bash
+cd frontend
+
+# 1. Instalar dependencias
+npm install
+
+# 2. Iniciar servidor de desarrollo Vite
+npm run dev
 ```
+> El cliente web estará disponible en `http://localhost:5173`.
 
 ---
 
-### **3. Ejecución del Backend (FastAPI)**
+## 🔒 Roles y Seguridad
 
-1. Entra a la carpeta `backend/` e instala dependencias:
-   ```bash
-   cd backend
-   pip install -r requirements.txt
-   ```
-
-2. *(Opcional)* Configura `.env` basándote en `.env.example`:
-   ```ini
-   DATABASE_URL="mysql+pymysql://root:@127.0.0.1:3306/unimarket"
-   SECRET_KEY="tu_clave_secreta_jwt"
-   ```
-
-3. Inicia el servidor directamente con Python:
-   ```bash
-   python main.py
-   ```
-   - **Backend API**: `http://127.0.0.1:8000`
-   - **Documentación Swagger UI**: `http://127.0.0.1:8000/docs`
+| Rol | Permisos |
+| :--- | :--- |
+| **COMPRADOR** | Explorar catálogo, filtrar por categorías y precios, gestionar carrito, realizar checkout, gestionar direcciones/tarjetas y calificar productos. |
+| **VENDEDOR** | Todas las funciones de comprador + registrar emprendimiento, crear/editar productos, gestionar stock, responder preguntas y actualizar estado de pedidos. |
+| **ADMINISTRADOR** | Control global de categorías, supervisión de usuarios y métricas del sistema. |
 
 ---
 
-### **4. Ejecución del Frontend (React + Vite)**
+## 📄 Licencia
 
-1. En una nueva terminal, navega a `frontend/`:
-   ```bash
-   cd frontend
-   npm install
-   ```
-
-2. Inicia el servidor de desarrollo:
-   ```bash
-   npm run dev
-   ```
-   - **Aplicación Web**: `http://localhost:5173`
-
----
-
-## 📊 Roles y Permisos en UNIMARKET
-
-| Rol | Permisos y Funcionalidades |
-|---|---|
-| 🛒 **Comprador** | Explorar catálogo, filtrar por categoría, agregar items al carrito, procesar órdenes de compra, visualizar historial de pedidos y calificar/reseñar productos. |
-| 💼 **Vendedor** | Registrar marca/emprendimiento, publicar productos, gestionar stock e imágenes, editar catálogo y consultar pedidos recibidos. |
-| 🛡️ **Administrador** | Crear y editar categorías globales, supervisar marcas registradas, gestionar roles de usuarios y auditar la plataforma. |
-
----
-
-## 📝 Licencia y Créditos
-
-Proyecto desarrollado como parte del programa de formación SENA / UNIMARKET.  
-Todos los derechos reservados.
+Este proyecto ha sido desarrollado como plataforma de comercio electrónico para aprendices y emprendedores del **SENA**.

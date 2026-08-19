@@ -1,6 +1,6 @@
-# Documentación de Arquitectura y Diagramas UML - UNIMARKET
+# Documentación de Arquitectura y Diagramas UML - SENAMARKET
 
-Este documento contiene la especificación de la arquitectura de **UNIMARKET** (Plataforma e-commerce para emprendimientos universitarios / SENA) mediante **9 diagramas UML distintos**, expresados en sintaxis nativa de **Mermaid**.
+Este documento especifica el diseño de software y la arquitectura del sistema **SenaMarket** (Plataforma E-Commerce para Emprendimientos del SENA) mediante **9 diagramas UML estándar**, expresados en sintaxis nativa de **Mermaid**.
 
 ---
 
@@ -8,19 +8,19 @@ Este documento contiene la especificación de la arquitectura de **UNIMARKET** (
 
 1. [Diagrama de Casos de Uso (Use Case Diagram)](#1-diagrama-de-casos-de-uso)
 2. [Diagrama de Clases del Dominio (Class Diagram)](#2-diagrama-de-clases-del-dominio)
-3. [Diagrama Entidad-Relación (ER Diagram / Modelo de Datos)](#3-diagrama-entidad-relación)
-4. [Diagrama de Secuencia: Procesamiento de Compra y Checkout](#4-diagrama-de-secuencia-procesamiento-de-compra-y-checkout)
-5. [Diagrama de Secuencia: Autenticación y Autorización JWT](#5-diagrama-de-secuencia-autenticación-y-autorización-jwt)
+3. [Diagrama Entidad-Relación (ER Diagram / Modelo MySQL)](#3-diagrama-entidad-relación)
+4. [Diagrama de Secuencia: Checkout y Procesamiento Atómico de Compra](#4-diagrama-de-secuencia-checkout-y-procesamiento-atómico-de-compra)
+5. [Diagrama de Secuencia: Autenticación, JWT y Control de Roles](#5-diagrama-de-secuencia-autenticación-jwt-y-control-de-roles)
 6. [Diagrama de Componentes del Sistema (Component Diagram)](#6-diagrama-de-componentes-del-sistema)
 7. [Diagrama de Despliegue de Infraestructura (Deployment Diagram)](#7-diagrama-de-despliegue-de-infraestructura)
 8. [Diagrama de Máquina de Estados: Ciclo de Vida de una Orden](#8-diagrama-de-máquina-de-estados-ciclo-de-vida-de-una-orden)
-9. [Diagrama de Actividades: Gestión de Productos por Vendedor](#9-diagrama-de-actividades-gestión-de-productos-por-vendedor)
+9. [Diagrama de Actividades: Publicación y Gestión de Catálogo por Vendedor](#9-diagrama-de-actividades-publicación-y-gestión-de-catálogo-por-vendedor)
 
 ---
 
 ## 1. Diagrama de Casos de Uso
 
-Muestra las interacciones clave entre los actores del sistema (**Comprador**, **Vendedor**, **Administrador** y **Sistema de Notificaciones**) y las funcionalidades principales ofrecidas por UNIMARKET.
+Muestra las interacciones clave entre los actores del sistema (**Comprador**, **Vendedor**, **Administrador** y **Servicio de Notificaciones**) y los módulos funcionales de SenaMarket.
 
 ```mermaid
 graph TD
@@ -30,20 +30,21 @@ graph TD
     Admin((":shield: Administrador"))
     NotifSys((":bell: Sistema Notificaciones"))
 
-    subgraph UNIMARKET ["Plataforma UNIMARKET"]
+    subgraph SENAMARKET ["Plataforma SenaMarket"]
         UC1["Registrarse / Iniciar Sesión"]
-        UC2["Explorar / Buscar Productos"]
-        UC3["Gestionar Carrito de Compras"]
-        UC4["Realizar Checkout y Pago"]
-        UC5["Dejar Calificación y Reseña"]
+        UC2["Explorar Catálogo con Filtros y Categorías"]
+        UC3["Gestionar Carrito Reactivo"]
+        UC4["Realizar Checkout Atómico y Pago"]
+        UC5["Hacer Pregunta / Dejar Calificación"]
 
-        UC6["Registrar Emprendimiento"]
+        UC6["Registrar Emprendimiento SENA"]
         UC7["Gestionar Catálogo de Productos (CRUD)"]
-        UC8["Visualizar Pedidos Recibidos"]
+        UC8["Visualizar y Despachar Pedidos"]
+        UC9["Responder Preguntas de Compradores"]
 
-        UC9["Gestionar Categorías"]
-        UC10["Administrar Usuarios y Emprendimientos"]
-        UC11["Enviar Notificación de Pedido"]
+        UC10["Gestionar Categorías y Conteos"]
+        UC11["Supervisión de Usuarios y Roles"]
+        UC12["Enviar Notificación de Pedido"]
     end
 
     %% Relaciones Comprador
@@ -58,27 +59,23 @@ graph TD
     Vendedor --> UC6
     Vendedor --> UC7
     Vendedor --> UC8
+    Vendedor --> UC9
 
     %% Relaciones Administrador
     Admin --> UC1
-    Admin --> UC9
     Admin --> UC10
+    Admin --> UC11
 
     %% Includes & Extends
-    UC4 ..> UC11 : <<include>>
-    UC11 --> NotifSys
+    UC4 ..> UC12 : <<include>>
+    UC12 --> NotifSys
 ```
-
-### Descripción Técnica
-- **Comprador**: Puede explorar productos, agregar al carrito, finalizar la orden y dejar reseñas tras la compra.
-- **Vendedor**: Extiende las capacidades del usuario registrando su marca/emprendimiento y administrando su inventario.
-- **Administrador**: Supervisa categorías globales, emprendimientos registrados y permisos en la plataforma.
 
 ---
 
 ## 2. Diagrama de Clases del Dominio
 
-Modela la estructura orientada a objetos del núcleo de UNIMARKET, sus atributos, métodos principales y las relaciones entre entidades (asociaciones, multiplicidades y composiciones).
+Modela la estructura del backend de SenaMarket, sus atributos tipados, métodos y relaciones entre entidades del dominio.
 
 ```mermaid
 classDiagram
@@ -88,6 +85,7 @@ classDiagram
         +string email
         +string contrasenaHash
         +RolEnum rol
+        +string telefono
         +DateTime creadoEn
         +registrar()
         +autenticar()
@@ -104,18 +102,18 @@ classDiagram
     class Emprendimiento {
         +int id
         +int usuarioId
-        +string nombreMarca
+        +string nombre
         +string descripcion
-        +string urlLogo
+        +string contacto
+        +string redSocial
         +DateTime creadoEn
-        +actualizarDatos()
     }
 
     class Categoria {
         +int id
         +string nombre
         +string descripcion
-        +crear()
+        +int cantidadProductos
     }
 
     class Producto {
@@ -124,46 +122,40 @@ classDiagram
         +int categoriaId
         +string nombre
         +string descripcion
-        +decimal precio
-        +int cantidadStock
+        +float precio
+        +int stock
         +string urlImagen
         +DateTime creadoEn
         +actualizarStock(int cantidad)
     }
 
-    class ItemCarrito {
+    class Orden {
         +int id
         +int usuarioId
-        +int productoId
-        +int cantidad
-        +DateTime agregadoEn
-        +modificarCantidad(int nuevaCantidad)
-    }
-
-    class Compra {
-        +int id
-        +int usuarioId
-        +decimal montoTotal
-        +EstadoCompraEnum estado
+        +float total
+        +EstadoOrdenEnum estado
+        +string direccionEnvio
+        +string metodoPago
         +DateTime creadoEn
-        +cambiarEstado(EstadoCompraEnum nuevoEstado)
+        +procesarPago()
+        +actualizarEstado(EstadoOrdenEnum nuevoEstado)
     }
 
-    class EstadoCompraEnum {
+    class EstadoOrdenEnum {
         <<enumeration>>
         PENDIENTE
         PAGADO
         ENVIADO
         ENTREGADO
+        CANCELADO
     }
 
-    class ItemCompra {
+    class ItemOrden {
         +int id
-        +int compraId
+        +int ordenId
         +int productoId
         +int cantidad
-        +decimal precioAlComprar
-        +calcularSubtotal() decimal
+        +float precioUnitario
     }
 
     class Resena {
@@ -175,416 +167,345 @@ classDiagram
         +DateTime creadoEn
     }
 
+    class Pregunta {
+        +int id
+        +int usuarioId
+        +int productoId
+        +string textoPregunta
+        +string textoRespuesta
+        +DateTime creadoEn
+    }
+
     %% Relaciones
-    Usuario "1" -- "0..1" Emprendimiento : posee >
-    Usuario "1" -- "0..*" ItemCarrito : gestiona >
-    Usuario "1" -- "0..*" Compra : realiza >
-    Usuario "1" -- "0..*" Resena : escribe >
-    Usuario --> RolEnum
-
-    Emprendimiento "1" -- "0..*" Producto : publica >
-    Categoria "1" -- "0..*" Producto : clasifica >
-
-    Producto "1" -- "0..*" ItemCarrito : agregado en >
-    Producto "1" -- "0..*" ItemCompra : incluido en >
-    Producto "1" -- "0..*" Resena : recibe >
-
-    Compra "1" *-- "1..*" ItemCompra : contiene >
-    Compra --> EstadoCompraEnum
+    Usuario "1" --> "1" RolEnum : tiene
+    Usuario "1" --> "0..1" Emprendimiento : lidera
+    Usuario "1" --> "0..*" Orden : realiza
+    Usuario "1" --> "0..*" Resena : publica
+    Usuario "1" --> "0..*" Pregunta : formula
+    
+    Emprendimiento "1" --> "0..*" Producto : ofrece
+    Categoria "1" --> "0..*" Producto : agrupa
+    
+    Orden "1" *-- "1..*" ItemOrden : contiene
+    Orden "1" --> "1" EstadoOrdenEnum : posee
+    Producto "1" <-- "0..*" ItemOrden : referencia
+    Producto "1" <-- "0..*" Resena : recibe
+    Producto "1" <-- "0..*" Pregunta : tiene
 ```
 
 ---
 
 ## 3. Diagrama Entidad-Relación
 
-Representa el modelo físico de la base de datos relacional MySQL configurado en `docs/schema.sql`, con sus claves primarias (`PK`), claves foráneas (`FK`), tipos de datos y cardinalidades.
+Esquema físico relacional implementado en MySQL 8.0.
 
 ```mermaid
 erDiagram
-    usuarios ||--o| emprendimientos : "registra (1:1/1:N)"
-    usuarios ||--o{ items_carrito : "posee"
-    usuarios ||--o{ compras : "realiza"
-    usuarios ||--o{ resenas : "escribe"
+    USUARIOS ||--o| EMPRENDIMIENTOS : "posee (1:1)"
+    USUARIOS ||--o{ ORDENES : "realiza (1:N)"
+    USUARIOS ||--o{ RESENAS : "escribe (1:N)"
+    USUARIOS ||--o{ PREGUNTAS : "pregunta (1:N)"
+    USUARIOS ||--o{ DIRECCIONES : "guarda (1:N)"
+    USUARIOS ||--o{ TARJETAS : "registra (1:N)"
+    
+    EMPRENDIMIENTOS ||--o{ PRODUCTOS : "publica (1:N)"
+    CATEGORIAS ||--o{ PRODUCTOS : "clasifica (1:N)"
+    
+    PRODUCTOS ||--o{ ITEMS_ORDEN : "incluido_en (1:N)"
+    PRODUCTOS ||--o{ RESENAS : "calificado_en (1:N)"
+    PRODUCTOS ||--o{ PREGUNTAS : "consultado_en (1:N)"
+    
+    ORDENES ||--|{ ITEMS_ORDEN : "contiene (1:N)"
 
-    emprendimientos ||--o{ productos : "publica"
-    categorias ||--o{ productos : "clasifica"
-
-    productos ||--o{ items_carrito : "está en"
-    productos ||--o{ items_compra : "forma parte de"
-    productos ||--o{ resenas : "tiene"
-
-    compras ||--|{ items_compra : "contiene"
-
-    usuarios {
-        INT id PK
-        VARCHAR nombre_completo
-        VARCHAR email UK
-        VARCHAR contrasena_hash
-        ENUM rol
-        TIMESTAMP creado_en
+    USUARIOS {
+        int id PK
+        string nombre_completo
+        string email UK
+        string contrasena_hash
+        string rol "COMPRADOR | VENDEDOR | ADMINISTRADOR"
+        string telefono
+        datetime creado_en
     }
 
-    emprendimientos {
-        INT id PK
-        INT usuario_id FK
-        VARCHAR nombre_marca
-        TEXT descripcion
-        VARCHAR url_logo
-        TIMESTAMP creado_en
+    EMPRENDIMIENTOS {
+        int id PK
+        int usuario_id FK, UK
+        string nombre
+        text descripcion
+        string contacto
+        string red_social
+        datetime creado_en
     }
 
-    categorias {
-        INT id PK
-        VARCHAR nombre UK
-        TEXT descripcion
+    CATEGORIAS {
+        int id PK
+        string nombre UK
+        string descripcion
     }
 
-    productos {
-        INT id PK
-        INT emprendimiento_id FK
-        INT categoria_id FK
-        VARCHAR nombre
-        TEXT descripcion
-        DECIMAL precio
-        INT cantidad_stock
-        VARCHAR url_imagen
-        TIMESTAMP creado_en
+    PRODUCTOS {
+        int id PK
+        int emprendimiento_id FK
+        int categoria_id FK
+        string nombre
+        text descripcion
+        decimal precio
+        int stock
+        string url_imagen
+        datetime creado_en
     }
 
-    items_carrito {
-        INT id PK
-        INT usuario_id FK
-        INT producto_id FK
-        INT cantidad
-        TIMESTAMP agregado_en
+    ORDENES {
+        int id PK
+        int usuario_id FK
+        decimal total
+        string estado "PENDIENTE | PAGADO | ENVIADO | ENTREGADO | CANCELADO"
+        string direccion_envio
+        string metodo_pago
+        datetime creado_en
     }
 
-    compras {
-        INT id PK
-        INT usuario_id FK
-        DECIMAL monto_total
-        ENUM estado
-        TIMESTAMP creado_en
+    ITEMS_ORDEN {
+        int id PK
+        int orden_id FK
+        int producto_id FK
+        int cantidad
+        decimal precio_unitario
     }
 
-    items_compra {
-        INT id PK
-        INT compra_id FK
-        INT producto_id FK
-        INT cantidad
-        DECIMAL precio_al_comprar
+    RESENAS {
+        int id PK
+        int usuario_id FK
+        int producto_id FK
+        int calificacion
+        text comentario
+        datetime creado_en
     }
 
-    resenas {
-        INT id PK
-        INT usuario_id FK
-        INT producto_id FK
-        INT calificacion
-        TEXT comentario
-        TIMESTAMP creado_en
+    PREGUNTAS {
+        int id PK
+        int usuario_id FK
+        int producto_id FK
+        text texto_pregunta
+        text texto_respuesta
+        datetime creado_en
     }
 ```
 
 ---
 
-## 4. Diagrama de Secuencia: Procesamiento de Compra y Checkout
+## 4. Diagrama de Secuencia: Checkout y Procesamiento Atómico de Compra
 
-Muestra el flujo sincrónico y asincrónico entre el cliente, el API Gateway, los microservicios de Carrito, Pedidos, Productos, la Base de Datos y la cola de eventos RabbitMQ al finalizar una compra.
+Representa la verificación de stock, débito atómico con rollback ante fallos, creación de la orden e invalidación de caché.
 
 ```mermaid
 sequenceDiagram
     autonumber
-    actor Cliente as Comprador (React App)
-    participant Gateway as API Gateway
-    participant CartSvc as Cart Service
-    participant OrderSvc as Order Service
-    participant ProductSvc as Product Service
-    participant DB as MySQL Database
-    participant MQ as RabbitMQ Broker
-    participant NotifSvc as Notification Service
+    actor Cliente as Comprador (React UI)
+    participant API as Backend FastAPI (/compras/checkout)
+    participant Auth as Validador JWT
+    participant DB as MySQL DB
+    participant Cache as Redis Cache
 
-    Cliente->>Gateway: POST /api/checkout (Bearer JWT)
-    Gateway->>Gateway: Validar Token JWT
-    Gateway->>OrderSvc: Crear Orden (usuario_id)
-
-    OrderSvc->>CartSvc: GET /cart/items (usuario_id)
-    CartSvc-->>OrderSvc: Retorna Items del Carrito
-
+    Cliente->>API: POST /compras/checkout (items, direccion, metodo_pago) + Bearer JWT
+    API->>Auth: Validar Token JWT
+    Auth-->>API: Usuario autenticado (id, rol)
+    
+    API->>DB: Iniciar Transacción (BEGIN)
+    
     loop Por cada producto en el carrito
-        OrderSvc->>ProductSvc: Validar y Reservar Stock (producto_id, cantidad)
-        ProductSvc->>DB: UPDATE productos SET stock = stock - N
-        DB-->>ProductSvc: Stock Actualizado
-        ProductSvc-->>OrderSvc: Confirmación Stock OK
+        API->>DB: SELECT stock, precio FROM productos WHERE id = ? FOR UPDATE
+        alt Stock insuficiente
+            DB-->>API: Stock < cantidad solicitada
+            API->>DB: ROLLBACK
+            API-->>Cliente: HTTP 400 Bad Request ("Stock insuficiente para el producto X")
+        else Stock disponible
+            API->>DB: UPDATE productos SET stock = stock - cantidad WHERE id = ?
+        end
     end
 
-    OrderSvc->>DB: INSERT INTO compras, items_compra
-    DB-->>OrderSvc: ID Compra Creada (Estado: PENDIENTE/PAGADO)
+    API->>DB: INSERT INTO ordenes (usuario_id, total, estado, ...)
+    API->>DB: INSERT INTO items_orden (orden_id, producto_id, cantidad, precio)
+    API->>DB: COMMIT Transacción
 
-    OrderSvc->>CartSvc: DELETE /cart/clear (usuario_id)
-    CartSvc->>DB: DELETE FROM items_carrito WHERE usuario_id
-    DB-->>CartSvc: Carrito Vacío
+    API->>Cache: Invalidate Cache: productos:* y categorias:*
+    Cache-->>API: Claves invalidadas OK
 
-    OrderSvc->>MQ: Publish Event: "order.created" (OrderDetails)
-    OrderSvc-->>Gateway: 201 Created (Order Response)
-    Gateway-->>Cliente: 201 Orden Confirmada
-
-    MQ-->>NotifSvc: Consume Event: "order.created"
-    NotifSvc->>NotifSvc: Enviar Email de Confirmación al Comprador/Vendedor
+    API-->>Cliente: HTTP 200 OK (orden_id, estado: "PAGADO", total)
 ```
 
 ---
 
-## 5. Diagrama de Secuencia: Autenticación y Autorización JWT
+## 5. Diagrama de Secuencia: Autenticación, JWT y Control de Roles
 
-Describe el procedimiento de inicio de sesión de usuarios, la interacción con la memoria caché en **Redis** para revocación/sesiones y la verificación de permisos en las peticiones entrantes.
+Detalla el inicio de sesión, validación criptográfica de contraseñas y asignación del token de acceso con verificación de roles.
 
 ```mermaid
 sequenceDiagram
     autonumber
     actor Usuario as Cliente Web
-    participant Gateway as API Gateway
-    participant AuthSvc as Auth Service / Backend Python
-    participant Redis as Redis Cache
-    participant DB as MySQL DB
+    participant AuthRouter as FastAPI /auth/token
+    participant Crypt as Passlib (bcrypt)
+    participant DB as MySQL Database
+    participant JWT as JWT Engine (HS256)
 
-    Usuario->>Gateway: POST /api/auth/login (email, contrasena)
-    Gateway->>AuthSvc: Forward /auth/login
-    AuthSvc->>DB: SELECT * FROM usuarios WHERE email = ?
-    DB-->>AuthSvc: Registro Usuario (Hash Contraseña)
+    Usuario->>AuthRouter: POST /auth/token (username=email, password)
+    AuthRouter->>DB: SELECT * FROM usuarios WHERE email = ?
     
-    AuthSvc->>AuthSvc: Verificar Hash bcrypt / Argon2
-    alt Credenciales Válidas
-        AuthSvc->>AuthSvc: Generar Access Token JWT (payload: id, email, rol)
-        AuthSvc->>Redis: SET session:user_id JWT_Token (TTL)
-        Redis-->>AuthSvc: OK
-        AuthSvc-->>Gateway: 200 OK { token, usuario }
-        Gateway-->>Usuario: 200 OK (Guarda Token en LocalStorage/Cookie)
-    else Credenciales Inválidas
-        AuthSvc-->>Gateway: 401 Unauthorized
-        Gateway-->>Usuario: 401 Error de Autenticación
+    alt Usuario no encontrado
+        DB-->>AuthRouter: null
+        AuthRouter-->>Usuario: HTTP 401 Unauthorized ("Credenciales inválidas")
+    else Usuario encontrado
+        DB-->>AuthRouter: Registro Usuario (hash_guardado, rol)
+        AuthRouter->>Crypt: verify(password_plana, hash_guardado)
+        
+        alt Contraseña incorrecta
+            Crypt-->>AuthRouter: False
+            AuthRouter-->>Usuario: HTTP 401 Unauthorized ("Credenciales inválidas")
+        else Contraseña correcta
+            Crypt-->>AuthRouter: True
+            AuthRouter->>JWT: encode({sub: email, user_id, rol, exp})
+            JWT-->>AuthRouter: access_token
+            AuthRouter-->>Usuario: HTTP 200 OK { access_token, token_type: "bearer", rol }
+        end
     end
-
-    note over Usuario, Gateway: Solicitud Posterior a Recurso Protegido
-    Usuario->>Gateway: GET /api/vendedoras/mis-productos (Header: Authorization Bearer JWT)
-    Gateway->>Gateway: Decodificar y Validar Firma de JWT
-    Gateway->>Redis: EXISTS session:blacklisted:JWT
-    Redis-->>Gateway: No (Token Válido)
-    Gateway->>Gateway: Verificar Rol ('VENDEDOR')
-    Gateway->>AuthSvc: Forward Request con Contexto de Usuario
-    AuthSvc-->>Gateway: 200 Datos del Catálogo
-    Gateway-->>Usuario: 200 Respuesta con Datos
 ```
 
 ---
 
 ## 6. Diagrama de Componentes del Sistema
 
-Visualiza la arquitectura lógica del sistema, organizada en **Frontend**, **API Gateway**, **Servicios Backend / Microservicios**, **Capa de Persistencia** y **Mensajería Event-Driven**.
+Ilustra la arquitectura por capas, la separación de responsabilidades y la integración entre el cliente web, la API REST y las capas de persistencia.
 
 ```mermaid
-componentDiagram
-    package "Capa de Presentación" {
-        [React + Vite Frontend] as FE
-    }
+graph TB
+    subgraph Frontend ["Capa Frontend (React 18 + Vite)"]
+        UI_Nav["Navbar & Logo SenaMarket"]
+        UI_Tabs["OfferTabs (Pestañas Ofertas)"]
+        UI_Sidebar["SidebarFilters (Filtros & Categorías BD)"]
+        UI_Grid["ProductCard Grid (3 Columnas)"]
+        UI_Context["ToastContext & CartContext"]
+        UI_API["apiFetch Client"]
+    end
 
-    package "Capa de Entrada / Enrutamiento" {
-        [API Gateway (Node/Express/Proxy)] as GW
-    }
+    subgraph Backend ["Capa Backend (FastAPI Core)"]
+        Router_Pub["Public Router (/productos, /categorias)"]
+        Router_Auth["Auth Router (/auth/token, /auth/me)"]
+        Router_Orders["Orders Router (/compras/checkout)"]
+        Router_Vendor["Vendor Router (/vendedor/*)"]
+        Middleware_CORS["CORSMiddleware"]
+        Service_Cache["Redis Cache Manager"]
+        ORM_SQLA["SQLAlchemy ORM"]
+    end
 
-    package "Capa de Lógica de Negocio (Monolito FastAPI / Microservicios)" {
-        [Auth Service / Monolito FastAPI] as AuthSvc
-        [Product Service] as ProdSvc
-        [Order Service] as OrderSvc
-        [Cart Service] as CartSvc
-        [User Service] as UserSvc
-        [Notification Service] as NotifSvc
-        [Sync Service] as SyncSvc
-        [Shared Core Library (@unimarket/shared)] as SharedLib
-    }
+    subgraph Persistencia ["Capa de Persistencia & Infraestructura"]
+        DB_MySQL[("MySQL 8.0\n(Relational Database)")]
+        DB_Redis[("Redis 7.0\n(Cache & Session Store)")]
+    end
 
-    package "Capa de Mensajería y Eventos" {
-        [RabbitMQ Event Broker] as MQ
-    }
+    %% Conexiones Frontend -> Backend
+    UI_API -->|HTTP REST / JSON| Middleware_CORS
+    Middleware_CORS --> Router_Pub
+    Middleware_CORS --> Router_Auth
+    Middleware_CORS --> Router_Orders
+    Middleware_CORS --> Router_Vendor
 
-    package "Capa de Persistencia y Caché" {
-        database "MySQL Database" as MySQL
-        database "Redis Cache" as Redis
-        database "MongoDB (Microservicios)" as Mongo
-    }
+    %% Conexiones Backend -> Persistencia
+    Router_Pub --> Service_Cache
+    Router_Pub --> ORM_SQLA
+    Router_Orders --> ORM_SQLA
+    Router_Orders --> Service_Cache
+    Router_Vendor --> ORM_SQLA
+    Router_Vendor --> Service_Cache
+    Router_Auth --> ORM_SQLA
 
-    %% Conexiones Frontend y Gateway
-    FE --> GW : HTTP/REST / WebSockets
-
-    %% Conexiones Gateway a Servicios
-    GW --> AuthSvc : /api/auth
-    GW --> ProdSvc : /api/products
-    GW --> OrderSvc : /api/orders
-    GW --> CartSvc : /api/cart
-    GW --> UserSvc : /api/users
-
-    %% Shared Library Dependency
-    AuthSvc ..> SharedLib
-    ProdSvc ..> SharedLib
-    OrderSvc ..> SharedLib
-    CartSvc ..> SharedLib
-
-    %% Conexiones a Bases de Datos
-    AuthSvc --> MySQL
-    ProdSvc --> MySQL
-    OrderSvc --> MySQL
-    CartSvc --> Redis
-    UserSvc --> Mongo
-
-    AuthSvc --> Redis : Caché de Sesiones
-
-    %% Conexiones Asincrónicas (Mensajería)
-    OrderSvc --> MQ : Publica "order.created"
-    SyncSvc --> MQ : Publica "sync.updated"
-    MQ --> NotifSvc : Consume Eventos
-    MQ --> SyncSvc : Consume Eventos
+    Service_Cache --> DB_Redis
+    ORM_SQLA --> DB_MySQL
 ```
 
 ---
 
 ## 7. Diagrama de Despliegue de Infraestructura
 
-Ilustra la distribución física/contenedorizada de los nodos de hardware, contenedores Docker, redes internas y puertos asignados para producción/desarrollo.
+Topología física de servidores, puertos y protocolos de comunicación del entorno de producción y desarrollo.
 
 ```mermaid
 graph TB
-    subgraph ClientDevice [" Dispositivo del Usuario "]
-        Browser[" Web Browser (Chrome/Firefox/Safari)\nReact Single Page Application"]
-    end
+    ClientBrowser["💻 Navegador Web del Usuario\n(Chrome, Edge, Safari, Firefox)"]
 
-    subgraph CloudInfra [" Servidor / Infraestructura Cloud (Docker Host) "]
-        subgraph PublicNet [" Red Pública (DMZ / Nginx Ingress) "]
-            Proxy[" Nginx / Ingress Proxy\nPuerto 80 / 443 (SSL/TLS) "]
+    subgraph HostServer ["Servidor de Aplicación (Host / VPS / Cloud)"]
+        subgraph WebLayer ["Capa Web & Proxy Inverso"]
+            Nginx["Nginx / Reverse Proxy\n(Puertos 80 / 443 HTTPS)"]
         end
 
-        subgraph AppNet [" Red Interna Docker (unimarket-net) "]
-            APIGW[" Contenedor: API Gateway\n(Node.js / Express - Port 8000) "]
-            FastAPI[" Contenedor: Backend Core FastAPI\n(Python 3.11 - Port 8001) "]
-            SvcProd[" Contenedor: Product Microservice\n(Node.js - Port 8002) "]
-            SvcOrder[" Contenedor: Order Microservice\n(Node.js - Port 8003) "]
-            SvcCart[" Contenedor: Cart Microservice\n(Node.js - Port 8004) "]
-            SvcNotif[" Contenedor: Notification Microservice\n(Node.js - Port 8005) "]
+        subgraph ClientApp ["Frontend Static Host"]
+            ViteDist["Vite Static Build (/dist)\n(Puerto 5173 en Dev)"]
         end
 
-        subgraph EventLayer [" Capa de Eventos "]
-            RabbitMQ[" Contenedor: RabbitMQ Broker\nAMQP Port 5672 / Mgmt 15672 "]
+        subgraph APILayer ["Backend Application Runtime"]
+            FastAPIApp["Uvicorn ASGI Server\n(FastAPI Core - Puerto 8000)"]
         end
 
-        subgraph DataLayer [" Capa de Datos Persistente "]
-            MySQLNode[" Contenedor: MySQL 8.0\nPuerto 3306 (Volumen Persistente) "]
-            RedisNode[" Contenedor: Redis 7.0\nPuerto 6379 (In-Memory Cache) "]
-            MongoNode[" Contenedor: MongoDB 6.0\nPuerto 27017 (Document Store) "]
+        subgraph DataLayer ["Capa de Persistencia de Datos"]
+            MySQLService["MySQL Server 8.0\n(Puerto 3306)"]
+            RedisService["Redis Cache Server\n(Puerto 6379)"]
         end
     end
 
-    %% Flujo de Conexiones
-    Browser -->|HTTPS / Port 443| Proxy
-    Proxy -->|HTTP / Internal| APIGW
-
-    APIGW --> FastAPI
-    APIGW --> SvcProd
-    APIGW --> SvcOrder
-    APIGW --> SvcCart
-
-    FastAPI --> MySQLNode
-    FastAPI --> RedisNode
-
-    SvcProd --> MySQLNode
-    SvcOrder --> MySQLNode
-    SvcOrder --> RabbitMQ
-    SvcCart --> RedisNode
-    
-    RabbitMQ --> SvcNotif
-    SvcNotif --> MongoNode
+    %% Enlaces
+    ClientBrowser -->|HTTPS :443 / HTTP :5173| Nginx
+    Nginx -->|Sirve Estáticos| ViteDist
+    Nginx -->|Proxy Pass /api /docs| FastAPIApp
+    FastAPIApp -->|TCP / PyMySQL| MySQLService
+    FastAPIApp -->|TCP / Redis Protocol| RedisService
 ```
 
 ---
 
 ## 8. Diagrama de Máquina de Estados: Ciclo de Vida de una Orden
 
-Modela las transiciones del estado del registro `compras` (`PENDIENTE`, `PAGADO`, `ENVIADO`, `ENTREGADO`) y la condición de cancelación o reembolso.
+Modela las transiciones de estado de un pedido desde su creación hasta la entrega o cancelación.
 
 ```mermaid
 stateDiagram-v2
     [*] --> PENDIENTE : Usuario inicia checkout
-
-    PENDIENTE --> PAGADO : Pago confirmado exitosamente
-    PENDIENTE --> CANCELADO : Expiración de tiempo / Rechazo de pago
-
-    PAGADO --> ENVIADO : Vendedor despacha el paquete y agrega guía
-    PAGADO --> CANCELADO : Cancelación por falta de stock / Solicitud comprador
-
-    ENVIADO --> ENTREGADO : Comprador / Pasarela confirma recepción del producto
-
-    CANCELADO --> REEMBOLSADO : Procesamiento de devolución de dinero
-
-    ENTREGADO --> [*]
-    REEMBOLSADO --> [*]
-
-    note right of PENDIENTE
-        Se valida stock preliminar
-        y se genera el registro de compra.
-    end note
-
-    note right of PAGADO
-        Se notifica al vendedor
-        para empaque y despacho.
-    end note
-
-    note right of ENTREGADO
-        Se habilita la opción de
-        dejar Reseña y Calificación.
-    end note
+    
+    PENDIENTE --> PAGADO : Pago validado y stock debitado
+    PENDIENTE --> CANCELADO : Fondos insuficientes / Error en pago
+    
+    PAGADO --> ENVIADO : Vendedor despacha con número de guía
+    PAGADO --> CANCELADO : Solicitud de reembolso aprobada (Reintegro de stock)
+    
+    ENVIADO --> ENTREGADO : Pedido recibido por el comprador
+    ENVIADO --> CANCELADO : Novedad logística / Devolución
+    
+    ENTREGADO --> [*] : Proceso completado
+    CANCELADO --> [*] : Orden cerrada
 ```
 
 ---
 
-## 9. Diagrama de Actividades: Gestión de Productos por Vendedor
+## 9. Diagrama de Actividades: Publicación y Gestión de Catálogo por Vendedor
 
-Detalla el flujo condicional de actividades cuando un **Vendedor** desea autenticarse, verificar su perfil de emprendimiento y publicar o actualizar un producto en el catálogo.
+Flujo que describe el proceso de publicación de un nuevo producto, validación de campos, guardado en base de datos e invalidación de caché.
 
 ```mermaid
 flowchart TD
-    Start([Inicio: Vendedor accede al Panel]) --> Login{¿Sesión Iniciada?}
+    Start(["Inicio: Vendedor desea publicar producto"]) --> CheckRole{"¿Usuario tiene rol VENDEDOR?"}
     
-    Login -- No --> FormLogin[Ingresar Credenciales]
-    FormLogin --> AuthVal{¿Credenciales Correctas?}
-    AuthVal -- No --> ErrAuth[Mostrar Mensaje de Error] --> FormLogin
-    AuthVal -- Sí --> SetToken[Guardar Token JWT y Redirigir] --> CheckEmp
-
-    Login -- Sí --> CheckEmp{¿Posee Emprendimiento Registrado?}
-
-    CheckEmp -- No --> RegEmp[Completar Formulario de Emprendimiento: Nombre Marca, Logo, Descripción]
-    RegEmp --> SaveEmp[Guardar en BD 'emprendimientos'] --> CheckEmp
-
-    CheckEmp -- Sí --> Menu[Mostrar Panel del Vendedor]
-    Menu --> Action{¿Acción Deseada?}
-
-    Action -- Crear Producto --> FormProd[Llenar Datos: Nombre, Categoría, Precio, Stock, Imagen]
-    FormProd --> ValProd{¿Datos Válidos?}
-    ValProd -- No --> ErrProd[Mostrar Error de Validación] --> FormProd
-    ValProd -- Sí --> UploadImg[Subir / Guardar URL de Imagen]
-    UploadImg --> SaveProd[Insertar en BD 'productos']
-    SaveProd --> CleanCache[Invalidar Caché Redis de Productos]
-    CleanCache --> OkMsg[Mostrar Confirmación] --> Menu
-
-    Action -- Editar Producto --> SelectProd[Seleccionar Producto del Listado]
-    SelectProd --> EditForm[Modificar Precio / Stock / Descripción]
-    EditForm --> UpdateProd[UPDATE productos en BD]
-    UpdateProd --> CleanCache --> OkMsg
-
-    Action -- Salir --> End([Fin de Sesión])
+    CheckRole -- No --> PromoteRole["Registrar datos de Emprendimiento SENA"]
+    PromoteRole --> SaveEmp["Guardar Emprendimiento y Asignar Rol VENDEDOR"]
+    SaveEmp --> InputData
+    
+    CheckRole -- Sí --> InputData["Ingresar: Nombre, Descripción, Precio, Stock, Categoría, URL Imagen"]
+    
+    InputData --> Validate{"¿Datos válidos?\n(Precio > 0, Stock >= 0, Categoria existe)"}
+    
+    Validate -- No --> ShowError["Mostrar error de validación en pantalla"]
+    ShowError --> InputData
+    
+    Validate -- Sí --> SaveDB["Guardar producto en tabla 'productos' (MySQL)"]
+    SaveDB --> ClearCache["Invalidar caché Redis (productos:* y categorias:*)"]
+    ClearCache --> NotifyToast["Mostrar notificación Toast: '¡Producto publicado con éxito!'"]
+    NotifyToast --> End(["Fin: Producto visible en el catálogo general"])
 ```
-
----
-
-## Mantenimiento y Extensión
-
-Para modificar o agregar nuevos diagramas a esta documentación:
-1. Utilice el formato de bloque de código ` ```mermaid ` en markdown.
-2. Compruebe la sintaxis en cualquier visualizador compatible (VS Code Mermaid Preview, GitHub o [Mermaid Live Editor](https://mermaid.live)).
-3. Asegúrese de mantener coherencia entre el nombre de las tablas (`docs/schema.sql`) y los atributos representados en los diagramas.
