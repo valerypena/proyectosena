@@ -24,6 +24,7 @@ Esta guía detalla los pasos para desplegar **SenaMarket** (Backend FastAPI + Fr
 Si prefieres configurar cada servicio manualmente en la interfaz de Render:
 
 #### Paso 1: Desplegar el Backend (FastAPI Web Service)
+
 1. En Render Dashboard, haz clic en **New +** ➔ **Web Service**.
 2. Conecta tu repositorio de GitHub.
 3. Configura los siguientes campos:
@@ -43,6 +44,7 @@ Si prefieres configurar cada servicio manualmente en la interfaz de Render:
 ---
 
 #### Paso 2: Desplegar el Frontend (React Static Site)
+
 1. En Render Dashboard, haz clic en **New +** ➔ **Static Site**.
 2. Conecta tu repositorio de GitHub.
 3. Configura los siguientes campos:
@@ -70,6 +72,7 @@ Para conectar la variable `DATABASE_URL`, puedes usar cualquiera de estos provee
 3. **Clever Cloud** ([clever-cloud.com](https://www.clever-cloud.com/)): Instancias MySQL gestionadas.
 
 Formato de conexión:
+
 ```env
 DATABASE_URL=mysql+pymysql://usuario:contrasena@host:3306/nombre_basedatos
 ```
