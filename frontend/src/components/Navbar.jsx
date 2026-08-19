@@ -2,6 +2,8 @@ import React, { useState, useContext, useEffect, useRef } from 'react';
 import { Search, ShoppingCart, MapPin, Menu } from 'lucide-react';
 import { Link, useNavigate } from 'react-router-dom';
 import { AuthContext } from '../context/AuthContext';
+import { useCart } from '../context/CartContext';
+import { apiFetch } from '../utils/api';
 import './Navbar.css';
 
 const Navbar = () => {
@@ -12,13 +14,13 @@ const Navbar = () => {
     const [categories, setCategories] = useState([]);
     const [showCategories, setShowCategories] = useState(false);
     const { user, logout } = useContext(AuthContext);
+    const { totalItems } = useCart();
     const navigate = useNavigate();
     const suggestionsRef = useRef(null);
 
     useEffect(() => {
-        fetch('http://127.0.0.1:8000/categorias')
-            .then(res => res.json())
-            .then(data => setCategories(data))
+        apiFetch('/categorias')
+            .then(data => setCategories(data || []))
             .catch(err => console.error("Error fetching categories:", err));
     }, []);
 
@@ -26,9 +28,8 @@ const Navbar = () => {
     useEffect(() => {
         if (searchTerm.trim().length >= 2) {
             const delayDebounceFn = setTimeout(() => {
-                fetch(`http://127.0.0.1:8000/sugerencias?q=${encodeURIComponent(searchTerm)}`)
-                    .then(res => res.json())
-                    .then(data => setSuggestions(data))
+                apiFetch(`/sugerencias?q=${encodeURIComponent(searchTerm)}`)
+                    .then(data => setSuggestions(data || []))
                     .catch(err => console.error("Error fetching suggestions:", err));
             }, 300); // Debounce
             return () => clearTimeout(delayDebounceFn);
@@ -207,8 +208,29 @@ const Navbar = () => {
                                 <Link to="/mis-compras">Mis compras</Link>
                             </>
                         )}
-                        <Link to="/carrito" className="nav-cart" style={{ display: 'flex', alignItems: 'center' }}>
+                        <Link to="/cart" className="nav-cart" style={{ display: 'flex', alignItems: 'center', position: 'relative' }}>
                             <ShoppingCart size={24} color="#333" />
+                            {totalItems > 0 && (
+                                <span
+                                    className="cart-badge-pulse"
+                                    style={{
+                                        position: 'absolute',
+                                        top: '-8px',
+                                        right: '-10px',
+                                        backgroundColor: '#ff5722',
+                                        color: '#fff',
+                                        borderRadius: '50%',
+                                        padding: '2px 6px',
+                                        fontSize: '11px',
+                                        fontWeight: 'bold',
+                                        minWidth: '18px',
+                                        textAlign: 'center',
+                                        boxShadow: '0 2px 5px rgba(0,0,0,0.2)'
+                                    }}
+                                >
+                                    {totalItems > 99 ? '99+' : totalItems}
+                                </span>
+                            )}
                         </Link>
                     </div>
                 </div>

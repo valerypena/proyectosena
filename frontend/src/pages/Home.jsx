@@ -2,28 +2,34 @@ import React, { useEffect, useState } from 'react';
 import { Link } from 'react-router-dom';
 import BannerSlider from '../components/BannerSlider';
 import ProductSlider from '../components/ProductSlider';
+import { ProductSkeleton } from '../components/SkeletonLoader';
+import { ImageWithFallback } from '../components/ImageWithFallback';
 import { formatPrice } from '../utils/currency';
+import { apiFetch } from '../utils/api';
 import './Home.css';
 
 const Home = () => {
     const [allProducts, setAllProducts] = useState([]);
     const [offers, setOffers] = useState([]);
     const [featured, setFeatured] = useState([]);
+    const [loading, setLoading] = useState(true);
 
     useEffect(() => {
-        fetch('http://127.0.0.1:8000/productos?limit=100')
-            .then(res => res.json())
+        setLoading(true);
+        apiFetch('/productos?limit=100')
             .then(data => {
-                setAllProducts(data);
+                const prods = data || [];
+                setAllProducts(prods);
 
                 // Simular lógica de productos al azar para sliders
-                const shuffled = [...data].sort(() => 0.5 - Math.random());
+                const shuffled = [...prods].sort(() => 0.5 - Math.random());
                 setOffers(shuffled.slice(0, 15));
 
-                const shuffled2 = [...data].sort(() => 0.5 - Math.random());
+                const shuffled2 = [...prods].sort(() => 0.5 - Math.random());
                 setFeatured(shuffled2.slice(0, 15));
             })
-            .catch(err => console.error("Error fetching products:", err));
+            .catch(err => console.error("Error fetching products:", err))
+            .finally(() => setLoading(false));
     }, []);
 
     return (
@@ -72,20 +78,24 @@ const Home = () => {
             {/* Grid Principal (El resto de productos) */}
             <section className="container products-section">
                 <h2 className="section-title">Descubre más productos</h2>
-                <div className="products-grid">
-                    {allProducts.slice(0, 20).map(prod => (
-                        <Link to={`/items/${prod.id}`} key={prod.id} className="card product-card">
-                            <div className="product-img-container">
-                                <img src={prod.url_imagen || "https://via.placeholder.com/224"} alt={prod.nombre} />
-                            </div>
-                            <div className="product-info">
-                                <h3 className="product-price">{formatPrice(prod.precio)}</h3>
-                                <span className="shipping-free">Envío gratis</span>
-                                <p className="product-title">{prod.nombre}</p>
-                            </div>
-                        </Link>
-                    ))}
-                </div>
+                {loading ? (
+                    <ProductSkeleton count={8} />
+                ) : (
+                    <div className="products-grid">
+                        {allProducts.slice(0, 20).map(prod => (
+                            <Link to={`/items/${prod.id}`} key={prod.id} className="card product-card">
+                                <div className="product-img-container">
+                                    <ImageWithFallback src={prod.url_imagen} alt={prod.nombre} />
+                                </div>
+                                <div className="product-info">
+                                    <h3 className="product-price">{formatPrice(prod.precio)}</h3>
+                                    <span className="shipping-free">Envío gratis</span>
+                                    <p className="product-title">{prod.nombre}</p>
+                                </div>
+                            </Link>
+                        ))}
+                    </div>
+                )}
             </section>
         </main>
     );

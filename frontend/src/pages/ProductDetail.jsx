@@ -1,7 +1,11 @@
 import React, { useEffect, useState, useContext } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import { AuthContext } from '../context/AuthContext';
+import { useCart } from '../context/CartContext';
+import { useToast } from '../context/ToastContext';
 import { formatPrice } from '../utils/currency';
+import { apiFetch } from '../utils/api';
+import { ImageWithFallback } from '../components/ImageWithFallback';
 import Breadcrumbs from '../components/Breadcrumbs';
 import { Star, MessageCircle, Send } from 'lucide-react';
 import './ProductDetail.css';
@@ -10,7 +14,10 @@ const ProductDetail = () => {
     const { id } = useParams();
     const [product, setProduct] = useState(null);
     const [question, setQuestion] = useState('');
+    const [asking, setAsking] = useState(false);
     const { token, user } = useContext(AuthContext);
+    const { addToCart } = useCart();
+    const { success, error } = useToast();
     const navigate = useNavigate();
 
     useEffect(() => {
@@ -18,44 +25,47 @@ const ProductDetail = () => {
     }, [id]);
 
     const fetchProduct = () => {
-        fetch(`http://127.0.0.1:8000/productos/${id}`)
-            .then(res => res.json())
+        apiFetch(`/productos/${id}`)
             .then(data => setProduct(data))
-            .catch(err => console.error(err));
+            .catch(err => {
+                console.error(err);
+                error('Error al cargar detalles del producto');
+            });
     };
 
     const performAddToCart = async (redirect = false) => {
-        if (!token) { navigate('/login'); return; }
-        try {
-            const res = await fetch('http://127.0.0.1:8000/compras/carrito', {
-                method: 'POST',
-                headers: { 'Content-Type': 'application/json', 'Authorization': `Bearer ${token}` },
-                body: JSON.stringify({ producto_id: product.id, cantidad: 1 })
-            });
-            if (res.ok) {
-                if (redirect) navigate('/carrito');
-                else alert('¡Agregado al carrito!');
-            }
-        } catch (error) { console.error(error); }
+        if (!token) { 
+            navigate('/login'); 
+            return; 
+        }
+        const added = await addToCart(product.id, 1);
+        if (added && redirect) {
+            navigate('/cart');
+        }
     };
 
     const handleAskQuestion = async (e) => {
         e.preventDefault();
-        if (!token) { navigate('/login'); return; }
+        if (!token) { 
+            navigate('/login'); 
+            return; 
+        }
         if (!question.trim()) return;
 
         try {
-            const res = await fetch(`http://127.0.0.1:8000/preguntas/${id}`, {
+            setAsking(true);
+            await apiFetch(`/preguntas/${id}`, {
                 method: 'POST',
-                headers: { 'Content-Type': 'application/json', 'Authorization': `Bearer ${token}` },
-                body: JSON.stringify({ pregunta: question })
+                body: JSON.stringify({ pregunta: question.trim() })
             });
-            if (res.ok) {
-                setQuestion('');
-                fetchProduct(); // Recargar para mostrar la nueva pregunta
-                alert('Pregunta enviada');
-            }
-        } catch (err) { console.error(err); }
+            setQuestion('');
+            fetchProduct();
+            success('¡Pregunta enviada al vendedor!');
+        } catch (err) { 
+            error(err.message || 'Error al enviar pregunta');
+        } finally {
+            setAsking(false);
+        }
     };
 
     if (!product) return <div className="loading">Cargando...</div>;
@@ -72,7 +82,7 @@ const ProductDetail = () => {
 
             <div className="card detail-card">
                 <div className="detail-image">
-                    <img src={product.url_imagen} alt={product.nombre} />
+                    <ImageWithFallback src={product.url_imagen} alt={product.nombre} />
                 </div>
                 <div className="detail-info">
                     <span className="detail-condition">Nuevo | +100 vendidos</span>

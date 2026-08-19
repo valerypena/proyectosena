@@ -1,66 +1,75 @@
-import React, { useContext, useEffect, useState } from 'react';
-import { useNavigate } from 'react-router-dom';
-import { AuthContext } from '../context/AuthContext';
+import React from 'react';
+import { useNavigate, Link } from 'react-router-dom';
+import { useCart } from '../context/CartContext';
+import { ImageWithFallback } from '../components/ImageWithFallback';
 import { formatPrice } from '../utils/currency';
+import { ShoppingBag, ArrowRight, Trash2 } from 'lucide-react';
 import './Cart.css';
 
 const Cart = () => {
-    const { token } = useContext(AuthContext);
-    const [items, setItems] = useState([]);
-    const [total, setTotal] = useState(0);
-
-    useEffect(() => {
-        if (token) {
-            fetchItems();
-        }
-    }, [token]);
-
-    const fetchItems = () => {
-        fetch('http://127.0.0.1:8000/compras/carrito', {
-            headers: { 'Authorization': `Bearer ${token}` }
-        })
-            .then(res => res.json())
-            .then(data => {
-                setItems(data);
-                // Calcular total simple
-                // Nota: El endpoint actual retorna items, pero no detalles completos del producto (nombre, precio, img)
-                // Tuvimos que editar backend/schemas.py para incluir `producto: ProductoOut`
-                // Asumimos que el backend ya lo devuelve así
-                const t = data.reduce((acc, item) => acc + (item.cantidad * item.producto.precio), 0);
-                setTotal(t);
-            })
-            .catch(console.error);
-    };
-
+    const { items, subtotal, removeFromCart, totalItems, loading } = useCart();
     const navigate = useNavigate();
 
-    const handleCheckout = () => {
-        navigate('/checkout');
-    };
+    const token = localStorage.getItem('token');
 
-    if (!token) return <div className="container"><h2>Inicia sesión para ver tu carrito</h2></div>;
+    if (!token) {
+        return (
+            <div className="container" style={{ padding: '60px 20px', textAlign: 'center' }}>
+                <div className="card" style={{ maxWidth: '500px', margin: '0 auto', padding: '40px 20px' }}>
+                    <ShoppingBag size={56} color="#ff5722" style={{ margin: '0 auto 16px' }} />
+                    <h2 style={{ marginBottom: '10px' }}>Inicia sesión para ver tu carrito</h2>
+                    <p style={{ color: '#666', marginBottom: '24px' }}>Descubre miles de ofertas y guarda tus productos favoritos.</p>
+                    <Link to="/login" className="btn-primary" style={{ display: 'inline-block' }}>
+                        Iniciar Sesión
+                    </Link>
+                </div>
+            </div>
+        );
+    }
 
-    if (items.length === 0) return <div className="container" style={{ padding: '20px' }}><h2>Tu carrito está vacío</h2></div>;
+    if (items.length === 0 && !loading) {
+        return (
+            <div className="container" style={{ padding: '60px 20px', textAlign: 'center' }}>
+                <div className="card" style={{ maxWidth: '500px', margin: '0 auto', padding: '40px 20px' }}>
+                    <ShoppingBag size={56} color="#94a3b8" style={{ margin: '0 auto 16px' }} />
+                    <h2 style={{ marginBottom: '10px' }}>Tu carrito está vacío</h2>
+                    <p style={{ color: '#666', marginBottom: '24px' }}>¿No sabes qué comprar? ¡Miles de productos te esperan!</p>
+                    <Link to="/" className="btn-primary" style={{ display: 'inline-flex', alignItems: 'center', gap: '8px' }}>
+                        Descubrir productos <ArrowRight size={16} />
+                    </Link>
+                </div>
+            </div>
+        );
+    }
 
     return (
         <div className="container cart-container">
             <div className="cart-items card">
-                <h2>Carrito ({items.reduce((acc, i) => acc + i.cantidad, 0)})</h2>
+                <h2>Carrito ({totalItems})</h2>
                 {items.map(item => (
                     <div key={item.id} className="cart-item">
                         <div className="cart-img">
-                            {/* Proteger si item.producto es null por alguna razon */}
-                            {item.producto && <img src={item.producto.url_imagen || "https://via.placeholder.com/60"} alt={item.producto.nombre} />}
+                            <ImageWithFallback 
+                                src={item.producto?.url_imagen} 
+                                alt={item.producto?.nombre} 
+                                style={{ width: '64px', height: '64px', objectFit: 'contain', borderRadius: '4px' }}
+                            />
                         </div>
                         <div className="cart-details">
                             <h3>{item.producto?.nombre}</h3>
-                            <span className="cart-action">Eliminar</span>
+                            <button 
+                                className="cart-action" 
+                                onClick={() => removeFromCart(item.id)}
+                                style={{ display: 'inline-flex', alignItems: 'center', gap: '4px', background: 'none', border: 'none', color: '#ef4444', cursor: 'pointer', fontSize: '13px', marginTop: '4px' }}
+                            >
+                                <Trash2 size={14} /> Eliminar
+                            </button>
                         </div>
                         <div className="cart-quantity">
-                            <span className="q-label">Unidades: {item.cantidad}</span>
+                            <span className="q-label">Unidades: <strong>{item.cantidad}</strong></span>
                         </div>
                         <div className="cart-price">
-                            {formatPrice(item.producto?.precio * item.cantidad)}
+                            {formatPrice((item.producto?.precio || 0) * item.cantidad)}
                         </div>
                     </div>
                 ))}
@@ -69,18 +78,20 @@ const Cart = () => {
             <div className="cart-summary card">
                 <h3>Resumen de compra</h3>
                 <div className="summary-row">
-                    <span>Productos</span>
-                    <span>{formatPrice(total)}</span>
+                    <span>Productos ({totalItems})</span>
+                    <span>{formatPrice(subtotal)}</span>
                 </div>
                 <div className="summary-row">
                     <span>Envío</span>
-                    <span className="green-text">Gratis</span>
+                    <span className="green-text" style={{ color: '#10b981', fontWeight: 'bold' }}>Gratis</span>
                 </div>
                 <div className="summary-total">
                     <span>Total</span>
-                    <span>{formatPrice(total)}</span>
+                    <span>{formatPrice(subtotal)}</span>
                 </div>
-                <button className="btn-primary checkout-btn" onClick={handleCheckout}>Continuar compra</button>
+                <button className="btn-primary checkout-btn" onClick={() => navigate('/checkout')}>
+                    Continuar compra
+                </button>
             </div>
         </div>
     );
