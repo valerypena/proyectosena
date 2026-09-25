@@ -13,7 +13,11 @@ services:
       - key: SECRET_KEY
         generateValue: true
       - key: DATABASE_URL
-        sync: false # Configurar con la URL de tu base de datos MySQL (ej. Aiven, TiDB, Render MySQL)
+        fromDatabase:
+          name: senamarket-db
+          property: connectionString
+      - key: REDIS_ENABLED
+        value: false
       - key: CORS_ORIGINS
         value: https://senamarket-web.onrender.com,http://localhost:5173
 
@@ -34,3 +38,10 @@ services:
           type: web
           name: senamarket-api
           property: url
+
+# 3. Base de Datos en la Nube (PostgreSQL Gratuita de Render)
+databases:
+  - name: senamarket-db
+    databaseName: senamarket
+    user: senamarket
+    plan: free

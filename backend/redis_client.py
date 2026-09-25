@@ -1,4 +1,5 @@
 import sys
+import os
 if hasattr(sys.stdout, 'reconfigure'):
     try:
         sys.stdout.reconfigure(encoding='utf-8')
@@ -15,6 +16,10 @@ REDIS_DB = settings.REDIS_DB
 
 class RedisCache:
     def __init__(self):
+        redis_enabled = os.getenv("REDIS_ENABLED", "false").lower() in ("true", "1")
+        if not redis_enabled or REDIS_HOST in ("", "none", "disabled"):
+            self.enabled = False
+            return
         try:
             self.client = redis.Redis(
                 host=REDIS_HOST,

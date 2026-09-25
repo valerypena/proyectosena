@@ -7,6 +7,8 @@ Thumbs.db
 env/
 venv/
 ENV/
+my_venv/
+backend/venv/
 build/
 dist/
 *.pyc
@@ -35,6 +37,7 @@ frontend/build/
 # Variables de Entorno (¡IMPORTante!)
 .env
 backend/.env
+frontend/.env
 frontend/.env.local
 frontend/.env.development.local
 frontend/.env.test.local

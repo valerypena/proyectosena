@@ -1,85 +1,71 @@
-# 🚀 Guía de Despliegue en Render - SENAMARKET
+# 🚀 Guía Completa de Despliegue en Render - SENAMARKET
 
-Esta guía detalla los pasos para desplegar **SenaMarket** (Backend FastAPI + Frontend React 18 / Vite) en [Render.com](https://render.com).
-
----
-
-## 📋 Métodos de Despliegue
-
-### Opción 1: Despliegue Automático con Blueprint (`render.yaml`) ⭐ *Recomendado*
-
-1. Ingresa a tu cuenta en [Render Dashboard](https://dashboard.render.com/).
-2. Haz clic en **New +** y selecciona **Blueprint**.
-3. Conecta tu repositorio de GitHub `proyectosena`.
-4. Render detectará automáticamente el archivo [`render.yaml`](../render.yaml) y creará los dos servicios:
-   - **`senamarket-api`** (Web Service en Python / FastAPI).
-   - **`senamarket-web`** (Static Site en React / Vite).
-5. Ingresa el valor de tu variable de entorno `DATABASE_URL` (tu base de datos MySQL en la nube).
-6. Haz clic en **Apply** y Render iniciará la compilación y despliegue automático de ambos servicios.
+Esta guía detalla los pasos para desplegar **SenaMarket** (Backend FastAPI + Frontend React 18 / Vite + Base de Datos) en [Render.com](https://render.com).
 
 ---
 
-### Opción 2: Despliegue Manual Servicio por Servicio
+## 📦 Paso 1: Subir tu Repositorio a GitHub
 
-Si prefieres configurar cada servicio manualmente en la interfaz de Render:
+Para que Render pueda construir tu aplicación, el proyecto debe estar en tu cuenta de GitHub:
 
-#### Paso 1: Desplegar el Backend (FastAPI Web Service)
+1. Ve a [GitHub](https://github.com/new) y crea un nuevo repositorio llamado `proyectosena` (público o privado).
+2. Abre la terminal o PowerShell en la carpeta del proyecto y ejecuta:
 
-1. En Render Dashboard, haz clic en **New +** ➔ **Web Service**.
-2. Conecta tu repositorio de GitHub.
-3. Configura los siguientes campos:
-   - **Name**: `senamarket-api`
-   - **Root Directory**: `backend`
-   - **Environment**: `Python 3`
-   - **Build Command**: `pip install -r requirements.txt`
-   - **Start Command**: `uvicorn main:app --host 0.0.0.0 --port $PORT`
-   - **Plan**: Free
-4. Agrega las siguientes **Environment Variables**:
-   - `PYTHON_VERSION`: `3.11.9`
-   - `DATABASE_URL`: `mysql+pymysql://<usuario>:<password>@<host>:<puerto>/<nombre_bd>`
-   - `SECRET_KEY`: `(Generar una clave segura aleatoria)`
-   - `CORS_ORIGINS`: `https://senamarket-web.onrender.com,http://localhost:5173`
-5. Haz clic en **Create Web Service**. Copia la URL generada (ej. `https://senamarket-api.onrender.com`).
+```bash
+# Vincular con tu repositorio remoto de GitHub (sustituye TU_USUARIO):
+git remote add origin https://github.com/TU_USUARIO/proyectosena.git
 
----
-
-#### Paso 2: Desplegar el Frontend (React Static Site)
-
-1. En Render Dashboard, haz clic en **New +** ➔ **Static Site**.
-2. Conecta tu repositorio de GitHub.
-3. Configura los siguientes campos:
-   - **Name**: `senamarket-web`
-   - **Root Directory**: `frontend`
-   - **Build Command**: `npm install && npm run build`
-   - **Publish Directory**: `dist`
-4. En la pestaña **Redirects / Rewrites**, agrega una regla:
-   - **Type**: `Rewrite`
-   - **Source Path**: `/*`
-   - **Destination Path**: `/index.html`
-   *(Nota: También está configurado automáticamente mediante el archivo `public/_redirects`)*.
-5. En **Environment Variables**, agrega:
-   - `VITE_API_URL`: `https://senamarket-api.onrender.com` *(La URL de tu backend del Paso 1)*.
-6. Haz clic en **Create Static Site**.
-
----
-
-## 🗄️ Opciones de Base de Datos MySQL en la Nube
-
-Para conectar la variable `DATABASE_URL`, puedes usar cualquiera de estos proveedores gratuitos y compatibles:
-
-1. **Aiven for MySQL** ([aiven.io](https://aiven.io/)): Plan gratuito con MySQL 8.0 gestionado.
-2. **TiDB Cloud Serverless** ([pingcap.com/tidbcloud](https://tidbcloud.com/)): 100% compatible con protocolo MySQL 8.0, 25 GB gratis.
-3. **Clever Cloud** ([clever-cloud.com](https://www.clever-cloud.com/)): Instancias MySQL gestionadas.
-
-Formato de conexión:
-
-```env
-DATABASE_URL=mysql+pymysql://usuario:contrasena@host:3306/nombre_basedatos
+# Subir los cambios a la rama principal:
+git push -u origin main
 ```
 
+*(Si es la primera vez que subes código desde este equipo, GitHub te solicitará iniciar sesión en la ventana emergente).*
+
 ---
 
-## ✅ Verificación del Despliegue
+## 📋 Paso 2: Despliegue en Render.com
 
-1. **Backend**: Accede a `https://senamarket-api.onrender.com/docs` para ver la documentación Swagger interactiva.
-2. **Frontend**: Abre `https://senamarket-web.onrender.com` para navegar en la plataforma con catálogo, filtros y carrito reactivo en vivo.
+### Opción 1: Despliegue 1-Click con Blueprint (`render.yaml`) ⭐ *Recomendado*
+
+El archivo [`render.yaml`](../render.yaml) ya está configurado para aprovisionar todo de forma automática:
+- **`senamarket-db`**: Base de datos PostgreSQL gratuita gestionada en Render.
+- **`senamarket-api`**: Servicio Web FastAPI en Python 3.11 con conexión automática a la base de datos y creación/poblado de tablas en el arranque (`lifespan`).
+- **`senamarket-web`**: Sitio Estático React 18 + Vite con redirecciones y conexión a la URL del backend.
+
+**Pasos:**
+1. Inicia sesión en [Render Dashboard](https://dashboard.render.com/).
+2. Haz clic en el botón superior **New +** y selecciona **Blueprint**.
+3. Conecta tu repositorio de GitHub `proyectosena`.
+4. Render detectará automáticamente el archivo `render.yaml` y mostrará los recursos a crear (`senamarket-db`, `senamarket-api`, `senamarket-web`).
+5. Haz clic en **Apply**.
+6. Render construirá y desplegará automáticamente la base de datos, el backend y el frontend.
+
+---
+
+### Opción 2: Usar una Base de Datos MySQL Externa (TiDB, Aiven o Clever Cloud)
+
+Si deseas utilizar MySQL en lugar de PostgreSQL:
+
+1. Crea tu base de datos gratuita en:
+   - **TiDB Cloud Serverless** ([tidbcloud.com](https://tidbcloud.com/)): 25 GB gratuitos, 100% compatible con MySQL 8.
+   - **Aiven for MySQL** ([aiven.io](https://aiven.io/)): Instancia MySQL gestionada.
+2. En Render Dashboard, ve a tu servicio **`senamarket-api`** ➔ **Environment**.
+3. Edita la variable `DATABASE_URL`:
+   ```env
+   DATABASE_URL=mysql+pymysql://usuario:contrasena@host:puerto/unimarket?ssl_verify_cert=true
+   ```
+4. Guarda los cambios. Render reiniciará el servicio y ejecutará automáticamente la siembra del catálogo.
+
+---
+
+## ✅ Paso 3: Verificación del Despliegue
+
+Una vez concluido el despliegue en Render:
+
+1. **Backend & Documentación Swagger**:
+   - Accede a `https://senamarket-api.onrender.com/docs`
+   - Prueba el endpoint `GET /productos` para comprobar que la base de datos responde.
+2. **Frontend en Producción**:
+   - Abre `https://senamarket-web.onrender.com`
+   - Navega por las categorías, filtros, buscador y ficha de producto en vivo.
+
