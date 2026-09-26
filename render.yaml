@@ -33,11 +33,10 @@ services:
         source: /*
         destination: /index.html
     envVars:
+      # URL pública del backend (ej: https://senamarket-api-xxxx.onrender.com).
+      # Se define a mano en el Dashboard: Render no expone la URL pública vía fromService.
       - key: VITE_API_URL
-        fromService:
-          type: web
-          name: senamarket-api
-          property: url
+        sync: false
 
 # 3. Base de Datos en la Nube (PostgreSQL Gratuita de Render)
 databases:
