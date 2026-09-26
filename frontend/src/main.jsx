@@ -4,6 +4,7 @@ import { GoogleOAuthProvider } from '@react-oauth/google'
 import './index.css'
 import App from './App.jsx'
 import { API_URL } from './config'
+import './responsive.css'
 
 // Interceptor global de fetch para redirigir peticiones de localhost al API Gateway o Servidor Monolítico en producción
 const originalFetch = window.fetch;

@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { useSearchParams } from 'react-router-dom';
 import { apiFetch } from '../utils/api';
-import { ChevronRight, Zap, X } from 'lucide-react';
+import { ChevronRight, Zap, X, SlidersHorizontal } from 'lucide-react';
 import './SidebarFilters.css';
 
 export const SidebarFilters = ({ totalCount = 0, title = 'Resultados' }) => {
@@ -10,6 +10,7 @@ export const SidebarFilters = ({ totalCount = 0, title = 'Resultados' }) => {
     const [fullShipping, setFullShipping] = useState(false);
     const [minPrice, setMinPrice] = useState(searchParams.get('min') || '');
     const [maxPrice, setMaxPrice] = useState(searchParams.get('max') || '');
+    const [filtersOpen, setFiltersOpen] = useState(false);
 
     const currentCategoryId = searchParams.get('category');
     const currentMin = searchParams.get('min');
@@ -84,8 +85,17 @@ export const SidebarFilters = ({ totalCount = 0, title = 'Resultados' }) => {
                     <strong>Todas</strong>
                     <span>{totalCount.toLocaleString('es-CO')} productos</span>
                 </div>
+                <button
+                    type="button"
+                    className="sidebar-filters-toggle"
+                    onClick={() => setFiltersOpen(open => !open)}
+                    aria-expanded={filtersOpen}
+                >
+                    <SlidersHorizontal size={16} /> {filtersOpen ? 'Ocultar filtros' : 'Filtrar'}
+                </button>
             </div>
 
+            <div className={`sidebar-filters-body ${filtersOpen ? 'open' : ''}`}>
             {hasActiveFilters && (
                 <button className="clear-filters-btn" onClick={clearAllFilters}>
                     <X size={14} /> Limpiar todos los filtros
@@ -251,6 +261,7 @@ export const SidebarFilters = ({ totalCount = 0, title = 'Resultados' }) => {
                         <span className="filter-count">(9.924)</span>
                     </li>
                 </ul>
+            </div>
             </div>
         </aside>
     );

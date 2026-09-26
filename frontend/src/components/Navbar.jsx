@@ -1,5 +1,5 @@
 import React, { useState, useContext, useEffect, useRef } from 'react';
-import { Search, ShoppingCart, MapPin, Menu } from 'lucide-react';
+import { Search, ShoppingCart, MapPin, Menu, X } from 'lucide-react';
 import { Link, useNavigate } from 'react-router-dom';
 import { AuthContext } from '../context/AuthContext';
 import { useCart } from '../context/CartContext';
@@ -13,6 +13,7 @@ const Navbar = () => {
     const [location, setLocation] = useState('Ingresa tu ubicación');
     const [categories, setCategories] = useState([]);
     const [showCategories, setShowCategories] = useState(false);
+    const [menuOpen, setMenuOpen] = useState(false);
     const { user, logout } = useContext(AuthContext);
     const { totalItems } = useCart();
     const navigate = useNavigate();
@@ -70,6 +71,17 @@ const Navbar = () => {
         }
     };
 
+    // Cierra el menú móvil al elegir cualquier enlace
+    const closeMenuOnLink = (e) => {
+        if (e.target.closest('a')) {
+            setMenuOpen(false);
+            setShowCategories(false);
+        }
+    };
+
+    // En pantallas táctiles el hover no existe: solo se abre con clic
+    const canHover = () => window.matchMedia('(hover: hover)').matches;
+
     const toggleCategories = (e) => {
         e.stopPropagation();
         setShowCategories(!showCategories);
@@ -89,10 +101,20 @@ const Navbar = () => {
     }, []);
 
     return (
-        <header className="nav-header">
+        <header className={`nav-header ${menuOpen ? 'nav-menu-open' : ''}`}>
             <div className="container header-container">
                 {/* Fila Superior: Logo, Búsqueda Central y Banner meli+ */}
                 <div className="nav-row-top">
+                    <button
+                        type="button"
+                        className="nav-menu-toggle"
+                        onClick={() => setMenuOpen(open => !open)}
+                        aria-label={menuOpen ? 'Cerrar menú' : 'Abrir menú'}
+                        aria-expanded={menuOpen}
+                    >
+                        {menuOpen ? <X size={24} color="#ffffff" /> : <Menu size={24} color="#ffffff" />}
+                    </button>
+
                     <Link to="/" className="nav-logo">
                         <img src="/logo.svg" alt="SenaMarket" className="nav-logo-img" />
                     </Link>
@@ -126,6 +148,15 @@ const Navbar = () => {
                         )}
                     </div>
 
+                    <Link to="/cart" className="nav-cart-btn nav-cart-mobile" aria-label="Carrito de compras">
+                        <ShoppingCart size={20} color="#ffffff" />
+                        {totalItems > 0 && (
+                            <span className="cart-badge-count">
+                                {totalItems > 99 ? '99+' : totalItems}
+                            </span>
+                        )}
+                    </Link>
+
                     <div className="nav-promo-banner">
                         <div className="meli-plus-tag">
                             <span className="meli-plus-brand">meli<strong>+</strong></span>
@@ -138,7 +169,7 @@ const Navbar = () => {
                 </div>
 
                 {/* Fila Inferior: Ubicación, Menú Central de Categorías y Perfil/Carrito */}
-                <div className="nav-row-bottom">
+                <div className="nav-row-bottom" onClick={closeMenuOnLink}>
                     <div className="nav-location" onClick={handleLocationClick}>
                         <MapPin size={18} className="nav-loc-icon" />
                         <div className="nav-loc-text">
@@ -150,8 +181,8 @@ const Navbar = () => {
                     <ul className="nav-links">
                         <li
                             className="nav-item-dropdown"
-                            onMouseEnter={() => setShowCategories(true)}
-                            onMouseLeave={() => setShowCategories(false)}
+                            onMouseEnter={() => canHover() && setShowCategories(true)}
+                            onMouseLeave={() => canHover() && setShowCategories(false)}
                             onClick={toggleCategories}
                         >
                             <span className="nav-link-dropdown">
@@ -250,7 +281,7 @@ const Navbar = () => {
                         <Link to="/mis-compras" className="nav-tool-link">Mis compras</Link>
                         <span className="nav-tool-link nav-favorites-trigger">Favoritos ▼</span>
 
-                        <Link to="/cart" className="nav-cart-btn" aria-label="Carrito de compras">
+                        <Link to="/cart" className="nav-cart-btn nav-cart-desktop" aria-label="Carrito de compras">
                             <ShoppingCart size={20} color="#ffffff" />
                             {totalItems > 0 && (
                                 <span className="cart-badge-count">
