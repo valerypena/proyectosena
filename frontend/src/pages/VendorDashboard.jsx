@@ -2,6 +2,7 @@ import React, { useState, useEffect, useContext } from 'react';
 import { useNavigate, Link } from 'react-router-dom';
 import { AuthContext } from '../context/AuthContext';
 import { formatPrice } from '../utils/currency';
+import { ImageWithFallback } from '../components/ImageWithFallback';
 import { Plus, Edit, Trash2, Package, DollarSign, TrendingUp, X, MessageSquare, ShoppingBag } from 'lucide-react';
 import './VendorDashboard.css';
 
@@ -244,7 +245,7 @@ const VendorDashboard = () => {
                                     <tr key={p.id}>
                                         <td>
                                             <div className="prod-cell">
-                                                <img src={p.url_imagen || "https://via.placeholder.com/50"} alt="" className="prod-thumb" />
+                                                <ImageWithFallback src={p.url_imagen} alt="" className="prod-thumb" />
                                                 <span className="prod-name">{p.nombre}</span>
                                             </div>
                                         </td>

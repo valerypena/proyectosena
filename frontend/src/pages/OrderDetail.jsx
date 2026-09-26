@@ -2,6 +2,7 @@ import React, { useState, useEffect, useContext } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import { AuthContext } from '../context/AuthContext';
 import { formatPrice } from '../utils/currency';
+import { ImageWithFallback } from '../components/ImageWithFallback';
 import { ArrowLeft, Package, MapPin, CreditCard, Calendar } from 'lucide-react';
 import './OrderDetail.css';
 
@@ -49,7 +50,7 @@ const OrderDetail = () => {
                         {order.items.map(item => (
                             <div key={item.id} className="order-item-detail">
                                 <div className="item-img">
-                                    <img src={item.producto?.url_imagen || "https://via.placeholder.com/150"} alt={item.producto?.nombre} />
+                                    <ImageWithFallback src={item.producto?.url_imagen} alt={item.producto?.nombre} />
                                 </div>
                                 <div className="item-info">
                                     <div className="item-name">{item.producto?.nombre}</div>

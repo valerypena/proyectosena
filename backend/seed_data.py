@@ -2,6 +2,12 @@ from sqlalchemy.orm import Session
 from database import SessionLocal, engine
 from models import Usuario, Emprendimiento, Categoria, Producto, RolUsuario
 import bcrypt
+import re
+import unicodedata
+
+def slugify(texto):
+    texto = unicodedata.normalize('NFKD', texto).encode('ascii', 'ignore').decode().lower()
+    return re.sub(r'[^a-z0-9]+', '-', texto).strip('-')
 
 # Función simple para hashear (sin passlib para evitar conflictos de versiones)
 def get_password_hash(password):
@@ -250,8 +256,8 @@ def seed_data():
             cat_nombre_vendedor = datos_vendedores[idx_emprendimiento][3]
             cat = categorias_map.get(cat_nombre_vendedor, categorias_map.get("Otros"))
         
-        # Generar URL de imagen específica con palabras clave
-        image_url = f"https://loremflickr.com/400/400/{keywords.replace(' ','')}?lock={hash(nombre) % 1000}"
+        # Imagen servida por el frontend desde frontend/public/productos/<slug>.jpg
+        image_url = f"/productos/{slugify(nombre)}.jpg"
 
         # Buscar si ya existe
         prod = db.query(Producto).filter(Producto.nombre == nombre).first()

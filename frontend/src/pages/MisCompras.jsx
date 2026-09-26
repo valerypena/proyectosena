@@ -1,6 +1,7 @@
 import React, { useEffect, useState, useContext } from 'react';
 import { AuthContext } from '../context/AuthContext';
 import { formatPrice } from '../utils/currency';
+import { ImageWithFallback } from '../components/ImageWithFallback';
 import { Link } from 'react-router-dom';
 import { Star, X } from 'lucide-react';
 import './MisCompras.css';
@@ -83,7 +84,7 @@ const MisCompras = () => {
                                 {order.items.map(item => (
                                     <div key={item.id} className="order-item-mini">
                                         <div style={{ display: 'flex', gap: '15px', alignItems: 'center' }}>
-                                            <img src={item.producto.url_imagen} alt="" style={{ width: '40px', height: '40px', objectFit: 'cover', borderRadius: '4px' }} />
+                                            <ImageWithFallback src={item.producto.url_imagen} alt="" style={{ width: '40px', height: '40px', objectFit: 'cover', borderRadius: '4px' }} />
                                             <div>
                                                 <p style={{ fontSize: '13px', margin: 0 }}>{item.producto.nombre}</p>
                                                 <p style={{ fontSize: '12px', color: '#666', margin: 0 }}>{item.cantidad} x {formatPrice(item.precio_al_comprar)}</p>
