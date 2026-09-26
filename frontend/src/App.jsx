@@ -173,6 +173,7 @@ function App() {
                   <GenericSection title="Suscripciones" emptyMsg="No tienes suscripciones activas." />
                 </PrivateRoute>
               } />
+              <Route path="/cupones" element={<GenericSection title="Cupones" emptyMsg="Por ahora no tienes cupones disponibles." />} />
               <Route path="/mercado-play" element={<GenericSection title="Mercado Play" emptyMsg="Disfruta de películas y series gratis." actionLabel="Ir a ver" />} />
 
               {/* Secciones de Vendedor Genericas */}
