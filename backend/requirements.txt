@@ -12,3 +12,4 @@ google-auth
 requests
 redis
 psycopg2-binary
+psycopg
