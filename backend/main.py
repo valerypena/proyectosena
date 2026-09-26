@@ -100,6 +100,10 @@ app.include_router(questions.router) # /preguntas/...
 frontend_path = os.path.join(os.path.dirname(__file__), "..", "frontend", "dist")
 if os.path.exists(frontend_path):
     app.mount("/", StaticFiles(directory=frontend_path, html=True), name="frontend")
+else:
+    @app.get("/", include_in_schema=False)
+    def root():
+        return {"status": "ok", "api": "SenaMarket", "docs": "/docs", "productos": "/productos"}
 
 if __name__ == "__main__":
     import uvicorn
